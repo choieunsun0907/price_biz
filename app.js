@@ -298,6 +298,10 @@ function _updateSearchCountInfo(total, counts) {
 /* ===== 홈 카테고리 ===== */
 /* 홈 초기 안내 화면 - API 호출 없이 즉시 표시 */
 function _showHomeGuide() {
+  // 로딩 스피너 반드시 숨김
+  const loading = document.getElementById('homeLoading');
+  if (loading) loading.style.display = 'none';
+
   const grid = document.getElementById('homeGrid');
   if (!grid) return;
   grid.innerHTML = `
