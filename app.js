@@ -80,6 +80,11 @@ function showPage(name) {
 
   if (name === 'wishlist') renderWishlist();
   if (name === 'compare') renderCompare();
+  // 홈으로 이동 시 항상 초기 안내화면으로 리셋
+  if (name === 'home') {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    _showHomeGuide();
+  }
   window.scrollTo(0, 0);
 }
 
@@ -309,12 +314,6 @@ function _showHomeGuide() {
       <div class="home-guide-icon">🛒</div>
       <div class="home-guide-title">위 카테고리 탭을 눌러보세요!</div>
       <div class="home-guide-desc">싸카닷컴, 축구화, 유니폼 등 카테고리별 최저가 상품을 확인하세요</div>
-      <div class="home-guide-chips">
-        <button class="home-guide-chip" onclick="selectCategory('싸카닷컴 축구', document.querySelector('.tab-btn'))">🛒 싸카닷컴</button>
-        <button class="home-guide-chip" onclick="selectCategory('축구화', null)">⚽ 축구화</button>
-        <button class="home-guide-chip" onclick="selectCategory('축구유니폼', null)">👕 축구유니폼</button>
-        <button class="home-guide-chip" onclick="selectCategory('선글라스', null)">😎 선글라스</button>
-      </div>
     </div>
   `;
   document.getElementById('loadMoreWrap').style.display = 'none';
