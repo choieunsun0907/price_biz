@@ -296,6 +296,26 @@ function _updateSearchCountInfo(total, counts) {
 
 
 /* ===== 홈 카테고리 ===== */
+/* 홈 초기 안내 화면 - API 호출 없이 즉시 표시 */
+function _showHomeGuide() {
+  const grid = document.getElementById('homeGrid');
+  if (!grid) return;
+  grid.innerHTML = `
+    <div class="home-guide-wrap">
+      <div class="home-guide-icon">🛒</div>
+      <div class="home-guide-title">위 카테고리 탭을 눌러보세요!</div>
+      <div class="home-guide-desc">싸카닷컴, 축구화, 유니폼 등 카테고리별 최저가 상품을 확인하세요</div>
+      <div class="home-guide-chips">
+        <button class="home-guide-chip" onclick="selectCategory('싸카닷컴 축구', document.querySelector('.tab-btn'))">🛒 싸카닷컴</button>
+        <button class="home-guide-chip" onclick="selectCategory('축구화', null)">⚽ 축구화</button>
+        <button class="home-guide-chip" onclick="selectCategory('축구유니폼', null)">👕 축구유니폼</button>
+        <button class="home-guide-chip" onclick="selectCategory('선글라스', null)">😎 선글라스</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('loadMoreWrap').style.display = 'none';
+}
+
 async function selectCategory(category, btn) {
   state.homeCategory = category;
   state.homeStart = 1;
@@ -311,7 +331,6 @@ async function selectCategory(category, btn) {
     const data = await apiSearch(category, 'sim', 1, 16);
     state.homeStart = 1;
     renderHomeGrid(data.items || [], false);
-    // 상품이 16개 이상이면 더보기 표시
     if ((data.items || []).length >= 16) {
       document.getElementById('loadMoreWrap').style.display = 'block';
     }
@@ -1183,5 +1202,6 @@ window.addEventListener('DOMContentLoaded', () => {
   state.wishlist.forEach(item => _registerItem(item));
   state.compareList.forEach(item => _registerItem(item));
 
-  selectCategory('싸카닷컴 축구', document.querySelector('.tab-btn.active'));
+  // 초기 로딩 없음 - 탭 클릭 시에만 상품 로드 (속도 최적화)
+  _showHomeGuide();
 });
