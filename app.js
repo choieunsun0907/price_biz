@@ -1287,6 +1287,8 @@ function handleExcelFile(file) {
       excelState.items   = names;
       excelState.results = [];
       _renderExcelPreview(names, file.name);
+      // 업로드 완료 후 업로드존 축소 + 스크롤
+      _collapseUploadZone(file.name);
     } catch(err) {
       showToast('⚠️ 파일 읽기 실패: ' + err.message);
     } finally {
@@ -1302,6 +1304,28 @@ function handleExcelFile(file) {
     if (zone) zone.style.pointerEvents = '';
   };
   reader.readAsArrayBuffer(file);
+}
+
+/* 업로드 완료 후 업로드존 축소 */
+function _collapseUploadZone(fileName) {
+  var zone = document.getElementById('excelDropZone');
+  if (!zone) return;
+  zone.innerHTML =
+    '<div class="excel-upload-collapsed">' +
+    '<span class="upload-done-icon">✅</span>' +
+    '<span class="upload-done-text">' + escHtml(fileName) + ' 업로드 완료</span>' +
+    '<button class="upload-reselect-btn" onclick="resetExcelPage()">↩ 다시 선택</button>' +
+    '<input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleExcelFile(this.files[0])">' +
+    '</div>';
+  zone.style.padding    = '14px 20px';
+  zone.style.cursor     = 'default';
+  zone.style.background = '#f0faf0';
+  zone.style.borderColor = '#66bb6a';
+  // 미리보기 영역으로 스크롤
+  setTimeout(function() {
+    var preview = document.getElementById('excelPreviewWrap');
+    if (preview) preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
 }
 
 /* 미리보기 렌더링 */
@@ -1585,12 +1609,29 @@ function resetExcelPage() {
   document.getElementById('excelPreviewWrap').style.display  = 'none';
   document.getElementById('excelProgressWrap').style.display = 'none';
   document.getElementById('excelResultWrap').style.display   = 'none';
-  document.getElementById('excelFileInput').value = '';
   // 버튼 복구
   var startBtn = document.getElementById('excelSearchAllBtn');
   var cancelBtn = document.getElementById('excelCancelBtn');
   if (startBtn)  { startBtn.style.display = 'inline-flex'; startBtn.disabled = false; startBtn.textContent = '🔍 전체 최저가 검색 시작'; }
   if (cancelBtn) { cancelBtn.style.display = 'none'; cancelBtn.disabled = false; cancelBtn.textContent = '⛔ 검색 취소'; }
+  // 업로드존 원래대로 복원
+  _restoreUploadZone();
+}
+
+/* 업로드존 원래 상태로 복원 */
+function _restoreUploadZone() {
+  var zone = document.getElementById('excelDropZone');
+  if (!zone) return;
+  zone.innerHTML =
+    '<div class="excel-upload-icon">📄</div>' +
+    '<div class="excel-upload-text">파일을 드래그하거나 클릭해서 업로드</div>' +
+    '<div class="excel-upload-sub">.xlsx · .xls · .csv 지원 &nbsp;|&nbsp; 최대 200개 상품</div>' +
+    '<input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleExcelFile(this.files[0])">' +
+    '<button class="excel-upload-btn" onclick="document.getElementById(\"excelFileInput\").click()">📂 파일 선택</button>';
+  zone.style.padding     = '';
+  zone.style.cursor      = 'pointer';
+  zone.style.background  = '';
+  zone.style.borderColor = '';
 }
 
 /* ===== 초기 로드 ===== */

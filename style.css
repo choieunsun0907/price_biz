@@ -1677,6 +1677,38 @@ input { outline: none; border: none; }
   border-color: var(--blue);
   background: #e8f0ff;
 }
+
+/* 업로드 완료 후 축소 상태 */
+.excel-upload-collapsed {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+.upload-done-icon { font-size: 20px; }
+.upload-done-text {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2e7d32;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.upload-reselect-btn {
+  padding: 6px 14px;
+  background: #fff;
+  border: 1.5px solid #66bb6a;
+  border-radius: 8px;
+  color: #2e7d32;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+}
+.upload-reselect-btn:hover { background: #f0faf0; }
 .excel-upload-icon { font-size: 48px; line-height: 1; }
 .excel-upload-text { font-size: 16px; font-weight: 700; color: var(--black); }
 .excel-upload-sub  { font-size: 13px; color: var(--gray-400); }
