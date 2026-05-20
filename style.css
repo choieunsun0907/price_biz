@@ -1637,3 +1637,304 @@ input { outline: none; border: none; }
   .detail-info { padding: 16px; }
   .detail-title { font-size: 16px; }
 }
+
+
+/* ===================================================
+   엑셀 일괄검색 페이지
+   =================================================== */
+.excel-page-header {
+  padding: 32px 0 20px;
+  text-align: center;
+}
+.excel-page-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--black);
+  margin-bottom: 8px;
+}
+.excel-page-desc {
+  font-size: 14px;
+  color: var(--gray-400);
+  line-height: 1.6;
+}
+
+/* 업로드 드롭존 */
+.excel-upload-zone {
+  border: 2.5px dashed #b0c9f0;
+  border-radius: 18px;
+  background: #f5f9ff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 48px 24px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  margin-bottom: 16px;
+}
+.excel-upload-zone.drag-over {
+  border-color: var(--blue);
+  background: #e8f0ff;
+}
+.excel-upload-icon { font-size: 48px; line-height: 1; }
+.excel-upload-text { font-size: 16px; font-weight: 700; color: var(--black); }
+.excel-upload-sub  { font-size: 13px; color: var(--gray-400); }
+.excel-upload-btn {
+  margin-top: 6px;
+  padding: 10px 28px;
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+.excel-upload-btn:hover { background: #1a6fc4; }
+
+/* 양식 다운로드 힌트 */
+.excel-template-hint {
+  background: #fffbeb;
+  border: 1px solid #f5d87a;
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-size: 13px;
+  color: #7a5c00;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.excel-template-btn {
+  padding: 6px 14px;
+  background: #f5d87a;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #5a4400;
+  font-family: inherit;
+  cursor: pointer;
+}
+.excel-template-btn:hover { background: #edc84a; }
+
+/* 미리보기 영역 */
+.excel-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-600);
+}
+.excel-preview-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.excel-search-all-btn {
+  padding: 9px 20px;
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+.excel-search-all-btn:hover { background: #1a6fc4; }
+.excel-search-all-btn:disabled { background: #aac4e8; cursor: not-allowed; }
+.excel-reset-btn {
+  padding: 9px 16px;
+  background: #f1f3f5;
+  color: var(--gray-600);
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+.excel-reset-btn:hover { background: #e2e6ea; }
+
+.excel-preview-list {
+  background: #f8faff;
+  border: 1px solid #e2eaf8;
+  border-radius: 12px;
+  padding: 12px 16px;
+  max-height: 220px;
+  overflow-y: auto;
+  margin-bottom: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.excel-preview-chip {
+  background: #fff;
+  border: 1.5px solid #cfddf5;
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 13px;
+  color: var(--black);
+  white-space: nowrap;
+}
+.excel-preview-chip.invalid {
+  border-color: #f5c6cb;
+  color: #c0392b;
+  background: #fff5f5;
+}
+
+/* 진행 상태 바 */
+.excel-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.excel-progress-title { color: var(--blue); }
+.excel-progress-bar-bg {
+  width: 100%;
+  height: 10px;
+  background: #e2eaf8;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+.excel-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue), #00c6ff);
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+/* 결과 테이블 */
+.excel-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.excel-result-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #27ae60;
+}
+.excel-result-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.excel-export-btn {
+  padding: 9px 18px;
+  background: #27ae60;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+.excel-export-btn:hover { background: #1e8449; }
+
+.excel-result-table-wrap {
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid #e2eaf8;
+  margin-bottom: 40px;
+}
+.excel-result-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+.excel-result-table th {
+  background: #f0f5ff;
+  padding: 12px 14px;
+  text-align: left;
+  font-weight: 700;
+  color: var(--gray-600);
+  border-bottom: 2px solid #dce8fb;
+  white-space: nowrap;
+}
+.excel-result-table td {
+  padding: 11px 14px;
+  border-bottom: 1px solid #f0f3f8;
+  vertical-align: middle;
+}
+.excel-result-table tr:last-child td { border-bottom: none; }
+.excel-result-table tr:hover td { background: #f8faff; }
+
+/* 행 구분: 새 상품 그룹 */
+.excel-result-table tr.product-group-start td {
+  border-top: 2px solid #dce8fb;
+}
+.excel-result-table tr.product-group-start td.col-no {
+  font-weight: 700;
+  color: var(--blue);
+  font-size: 14px;
+}
+
+/* 순위 뱃지 */
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+}
+.rank-badge.rank-1 { background: #e67e22; }
+.rank-badge.rank-2 { background: #95a5a6; }
+.rank-badge.rank-3 { background: #d4a744; }
+
+/* 가격 */
+.excel-price {
+  font-weight: 700;
+  color: var(--orange-dark);
+  font-size: 14px;
+  white-space: nowrap;
+}
+.excel-price.best { color: #e74c3c; font-size: 15px; }
+
+/* 링크 버튼 */
+.excel-link-btn {
+  display: inline-block;
+  padding: 5px 12px;
+  background: #f0f5ff;
+  color: var(--blue);
+  border: 1px solid #cfddf5;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.excel-link-btn:hover { background: var(--blue); color: #fff; }
+
+/* 오류 행 */
+.excel-result-table tr.row-error td { color: #c0392b; }
+
+/* 상품명 컬럼 */
+.col-name { min-width: 200px; }
+.col-no   { width: 50px; }
+.col-rank { width: 60px; text-align: center; }
+.col-price { width: 120px; }
+.col-mall  { width: 130px; }
+.col-link  { width: 90px; }
+
+@media (max-width: 600px) {
+  .excel-result-table { font-size: 12px; }
+  .excel-result-table th,
+  .excel-result-table td { padding: 9px 8px; }
+  .col-name { min-width: 120px; }
+}

@@ -1199,6 +1199,240 @@ function escAttr(str) {
   return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
 }
 
+/* ==========================================================
+   엑셀 일괄검색 기능
+   ========================================================== */
+
+/* 엑셀 상태 */
+const excelState = {
+  items: [],        // 파싱된 상품명 배열
+  results: [],      // 검색 결과 [{name, top3:[{rank,title,lprice,mall,link}]}]
+  isSearching: false,
+};
+
+/* 드래그앤드롭 초기화 */
+document.addEventListener('DOMContentLoaded', function() {
+  const zone = document.getElementById('excelDropZone');
+  if (!zone) return;
+  zone.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    zone.classList.add('drag-over');
+  });
+  zone.addEventListener('dragleave', function() {
+    zone.classList.remove('drag-over');
+  });
+  zone.addEventListener('drop', function(e) {
+    e.preventDefault();
+    zone.classList.remove('drag-over');
+    var file = e.dataTransfer.files[0];
+    if (file) handleExcelFile(file);
+  });
+  zone.addEventListener('click', function(e) {
+    if (e.target.tagName !== 'BUTTON') {
+      document.getElementById('excelFileInput').click();
+    }
+  });
+});
+
+/* 파일 처리 */
+function handleExcelFile(file) {
+  if (!file) return;
+  var ext = file.name.split('.').pop().toLowerCase();
+  if (!['xlsx','xls','csv'].includes(ext)) {
+    showToast('⚠️ .xlsx, .xls, .csv 파일만 지원합니다');
+    return;
+  }
+
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var data = new Uint8Array(e.target.result);
+      var wb   = XLSX.read(data, { type: 'array' });
+      var ws   = wb.Sheets[wb.SheetNames[0]];
+      var rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+
+      // A열(index 0) 값 추출, 헤더 제거, 빈값 제거, 최대 200개
+      var names = [];
+      rows.forEach(function(row, i) {
+        var val = String(row[0] || '').trim();
+        // 1행이 헤더처럼 보이면(숫자 아닌 한글/영문) 제외 여부는 그냥 포함
+        if (val && val.length > 0) names.push(val);
+      });
+      names = names.slice(0, 200);
+
+      if (names.length === 0) {
+        showToast('⚠️ A열에 상품명이 없습니다. 파일을 확인해주세요.');
+        return;
+      }
+      excelState.items   = names;
+      excelState.results = [];
+      _renderExcelPreview(names);
+    } catch(err) {
+      showToast('⚠️ 파일 읽기 실패: ' + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+/* 미리보기 렌더링 */
+function _renderExcelPreview(names) {
+  document.getElementById('excelPreviewWrap').style.display = 'block';
+  document.getElementById('excelResultWrap').style.display  = 'none';
+  document.getElementById('excelProgressWrap').style.display = 'none';
+
+  document.getElementById('excelPreviewCount').textContent =
+    '📋 인식된 상품 ' + names.length + '개 (최대 200개)';
+
+  var list = document.getElementById('excelPreviewList');
+  list.innerHTML = '';
+  names.forEach(function(name) {
+    var chip = document.createElement('span');
+    chip.className = 'excel-preview-chip' + (name.length < 2 ? ' invalid' : '');
+    chip.textContent = name;
+    list.appendChild(chip);
+  });
+
+  var btn = document.getElementById('excelSearchAllBtn');
+  if (btn) btn.disabled = false;
+}
+
+/* 전체 일괄 검색 시작 */
+async function startExcelBulkSearch() {
+  if (excelState.isSearching) return;
+  var names = excelState.items.filter(function(n) { return n.length >= 2; });
+  if (names.length === 0) { showToast('⚠️ 유효한 상품명이 없습니다'); return; }
+
+  excelState.isSearching = true;
+  excelState.results = [];
+
+  // 버튼 비활성화
+  var btn = document.getElementById('excelSearchAllBtn');
+  if (btn) btn.disabled = true;
+
+  // 진행바 표시
+  document.getElementById('excelProgressWrap').style.display = 'block';
+  document.getElementById('excelResultWrap').style.display   = 'none';
+  _updateExcelProgress(0, names.length);
+
+  for (var i = 0; i < names.length; i++) {
+    var name = names[i];
+    try {
+      var data = await apiSearch(name, 'asc', 1, 5, ''); // 낮은가격순 5개
+      var items = (data.items || []).slice(0, 3);        // Top3만 사용
+      var top3 = items.map(function(it, idx) {
+        return {
+          rank:   idx + 1,
+          title:  it.title  || name,
+          lprice: it.lprice || 0,
+          mall:   it.mall   || '',
+          link:   it.link   || '#',
+        };
+      });
+      if (top3.length === 0) {
+        top3 = [{ rank: 1, title: '검색결과 없음', lprice: 0, mall: '-', link: '#' }];
+      }
+      excelState.results.push({ name: name, top3: top3 });
+    } catch(e) {
+      excelState.results.push({ name: name, top3: [{ rank:1, title:'API 오류', lprice:0, mall:'-', link:'#' }] });
+    }
+    _updateExcelProgress(i + 1, names.length);
+    // API 부하 방지: 100ms 간격
+    await new Promise(function(r) { setTimeout(r, 120); });
+  }
+
+  excelState.isSearching = false;
+  _renderExcelResults(excelState.results);
+}
+
+/* 진행 상태 업데이트 */
+function _updateExcelProgress(done, total) {
+  var pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  document.getElementById('excelProgressBar').style.width = pct + '%';
+  document.getElementById('excelProgressText').textContent = done + ' / ' + total + ' (' + pct + '%)';
+}
+
+/* 결과 테이블 렌더링 */
+function _renderExcelResults(results) {
+  document.getElementById('excelProgressWrap').style.display = 'none';
+  document.getElementById('excelResultWrap').style.display   = 'block';
+
+  var tbody = document.getElementById('excelResultBody');
+  tbody.innerHTML = '';
+
+  results.forEach(function(item, idx) {
+    item.top3.forEach(function(row, rankIdx) {
+      var tr = document.createElement('tr');
+      if (rankIdx === 0) tr.classList.add('product-group-start');
+      if (row.title === '검색결과 없음' || row.title === 'API 오류') tr.classList.add('row-error');
+
+      var noCell = rankIdx === 0
+        ? '<td class="col-no" rowspan="' + item.top3.length + '">' + (idx+1) + '</td>'
+        : '';
+      var nameCell = rankIdx === 0
+        ? '<td class="col-name" rowspan="' + item.top3.length + '">' + escHtml(item.name) + '</td>'
+        : '';
+
+      var rankBadge = '<span class="rank-badge rank-' + row.rank + '">' + row.rank + '</span>';
+      var priceStr  = row.lprice > 0
+        ? '<span class="excel-price' + (row.rank===1 ? ' best' : '') + '">' + row.lprice.toLocaleString() + '원</span>'
+        : '<span style="color:#aaa">-</span>';
+      var linkBtn   = row.link !== '#' && row.lprice > 0
+        ? '<a href="' + row.link + '" target="_blank" rel="noopener" class="excel-link-btn">보기 →</a>'
+        : '';
+
+      tr.innerHTML = noCell + nameCell +
+        '<td class="col-rank">' + rankBadge + '</td>' +
+        '<td class="col-price">' + priceStr + '</td>' +
+        '<td class="col-mall">'  + escHtml(row.mall)  + '</td>' +
+        '<td class="col-link">'  + linkBtn + '</td>';
+
+      tbody.appendChild(tr);
+    });
+  });
+}
+
+/* 결과 엑셀 다운로드 */
+function exportExcelResult() {
+  if (!excelState.results.length) return;
+  var rows = [['No', '검색 상품명', '순위', '최저가(원)', '쇼핑몰', '링크']];
+  excelState.results.forEach(function(item, idx) {
+    item.top3.forEach(function(row) {
+      rows.push([idx+1, item.name, row.rank, row.lprice, row.mall, row.link]);
+    });
+  });
+  var ws = XLSX.utils.aoa_to_sheet(rows);
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '최저가검색결과');
+  XLSX.writeFile(wb, '싸카_최저가검색_' + new Date().toISOString().slice(0,10) + '.xlsx');
+}
+
+/* 예시 양식 다운로드 */
+function downloadExcelTemplate() {
+  var rows = [
+    ['상품명'],
+    ['아디다스 레알마드리드 유니폼'],
+    ['나이키 축구화'],
+    ['오클리 선글라스'],
+    ['국가대표 유니폼'],
+    ['푸마 트레이닝복'],
+  ];
+  var ws = XLSX.utils.aoa_to_sheet(rows);
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '상품목록');
+  XLSX.writeFile(wb, '싸카_검색양식_예시.xlsx');
+}
+
+/* 초기화 */
+function resetExcelPage() {
+  excelState.items   = [];
+  excelState.results = [];
+  excelState.isSearching = false;
+  document.getElementById('excelPreviewWrap').style.display  = 'none';
+  document.getElementById('excelProgressWrap').style.display = 'none';
+  document.getElementById('excelResultWrap').style.display   = 'none';
+  document.getElementById('excelFileInput').value = '';
+}
+
 /* ===== 초기 로드 ===== */
 window.addEventListener('DOMContentLoaded', () => {
   // localStorage에서 불러온 아이템을 registry에 등록

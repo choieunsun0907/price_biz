@@ -22,6 +22,7 @@
     </div>
     <nav class="header-nav">
       <a href="#" onclick="showPage('home'); return false;">홈</a>
+      <a href="#" onclick="showPage('excel'); return false;">📂 엑셀 일괄검색</a>
       <a href="#" onclick="showPage('wishlist'); return false;">❤️ 위시리스트</a>
       <a href="#" onclick="showPage('compare'); return false;">📊 비교</a>
     </nav>
@@ -29,6 +30,7 @@
   </div>
   <div class="mobile-menu" id="mobileMenu">
     <a href="#" onclick="showPage('home'); toggleMenu(); return false;">🏠 홈</a>
+    <a href="#" onclick="showPage('excel'); toggleMenu(); return false;">📂 엑셀 일괄검색</a>
     <a href="#" onclick="showPage('wishlist'); toggleMenu(); return false;">❤️ 위시리스트</a>
     <a href="#" onclick="showPage('compare'); toggleMenu(); return false;">📊 비교</a>
   </div>
@@ -221,6 +223,80 @@
   </div>
 </div>
 
+<!-- ===== 엑셀 일괄검색 페이지 ===== -->
+<div id="page-excel" class="page">
+  <div class="container">
+    <div class="excel-page-header">
+      <h2 class="excel-page-title">📂 엑셀 일괄 최저가 검색</h2>
+      <p class="excel-page-desc">엑셀(.xlsx/.xls) 또는 CSV 파일을 업로드하면 상품명을 자동 인식해 네이버 최저가 Top 3를 한번에 조회합니다</p>
+    </div>
+
+    <!-- 업로드 존 -->
+    <div class="excel-upload-zone" id="excelDropZone">
+      <div class="excel-upload-icon">📄</div>
+      <div class="excel-upload-text">파일을 드래그하거나 클릭해서 업로드</div>
+      <div class="excel-upload-sub">.xlsx, .xls, .csv 지원 · 최대 200개 상품</div>
+      <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleExcelFile(this.files[0])">
+      <button class="excel-upload-btn" onclick="document.getElementById('excelFileInput').click()">📂 파일 선택</button>
+    </div>
+
+    <!-- 양식 다운로드 안내 -->
+    <div class="excel-template-hint">
+      💡 <strong>엑셀 양식 예시</strong>: A열에 상품명을 한 줄씩 입력하세요
+      <button class="excel-template-btn" onclick="downloadExcelTemplate()">📥 예시 양식 다운로드</button>
+    </div>
+
+    <!-- 파싱된 상품 목록 미리보기 -->
+    <div id="excelPreviewWrap" style="display:none">
+      <div class="excel-preview-header">
+        <span id="excelPreviewCount"></span>
+        <div class="excel-preview-actions">
+          <button class="excel-search-all-btn" id="excelSearchAllBtn" onclick="startExcelBulkSearch()">🔍 전체 최저가 검색 시작</button>
+          <button class="excel-reset-btn" onclick="resetExcelPage()">↩ 초기화</button>
+        </div>
+      </div>
+      <div id="excelPreviewList" class="excel-preview-list"></div>
+    </div>
+
+    <!-- 검색 진행 상태 -->
+    <div id="excelProgressWrap" style="display:none">
+      <div class="excel-progress-header">
+        <span class="excel-progress-title">⏳ 최저가 검색 중...</span>
+        <span id="excelProgressText">0 / 0</span>
+      </div>
+      <div class="excel-progress-bar-bg">
+        <div class="excel-progress-bar" id="excelProgressBar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- 결과 테이블 -->
+    <div id="excelResultWrap" style="display:none">
+      <div class="excel-result-header">
+        <span class="excel-result-title">✅ 검색 완료</span>
+        <div class="excel-result-actions">
+          <button class="excel-export-btn" onclick="exportExcelResult()">📥 결과 엑셀 다운로드</button>
+          <button class="excel-reset-btn" onclick="resetExcelPage()">↩ 다시 업로드</button>
+        </div>
+      </div>
+      <div class="excel-result-table-wrap">
+        <table class="excel-result-table" id="excelResultTable">
+          <thead>
+            <tr>
+              <th class="col-no">No</th>
+              <th class="col-name">상품명</th>
+              <th class="col-rank">순위</th>
+              <th class="col-price">최저가</th>
+              <th class="col-mall">쇼핑몰</th>
+              <th class="col-link">바로가기</th>
+            </tr>
+          </thead>
+          <tbody id="excelResultBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ===== 하단 내비 (모바일) ===== -->
 <nav class="bottom-nav">
   <a href="#" onclick="showPage('home'); return false;" class="bottom-nav-item active" id="nav-home">
@@ -230,6 +306,10 @@
   <a href="#" onclick="showPage('search'); return false;" class="bottom-nav-item" id="nav-search">
     <span class="nav-icon">🔍</span>
     <span>검색</span>
+  </a>
+  <a href="#" onclick="showPage('excel'); return false;" class="bottom-nav-item" id="nav-excel">
+    <span class="nav-icon">📂</span>
+    <span>일괄검색</span>
   </a>
   <a href="#" onclick="showPage('compare'); return false;" class="bottom-nav-item" id="nav-compare">
     <span class="nav-icon">📊</span>
@@ -249,6 +329,8 @@
   <p class="footer-copy">Copyright 2026 ⓒ <strong>ChoiEunsun</strong>. All rights reserved.</p>
 </footer>
 
+<!-- SheetJS: 엑셀 파싱 라이브러리 -->
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
