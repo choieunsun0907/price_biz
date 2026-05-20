@@ -1200,14 +1200,15 @@ function escAttr(str) {
 }
 
 /* ==========================================================
-   엑셀 일괄검색 기능
+   엑셀 일괄검색 기능 (v2 - 완전 개선)
    ========================================================== */
 
 /* 엑셀 상태 */
 const excelState = {
-  items: [],        // 파싱된 상품명 배열
-  results: [],      // 검색 결과 [{name, top3:[{rank,title,lprice,mall,link}]}]
+  items: [],           // 파싱된 상품명 배열
+  results: [],         // 검색 결과 [{name, top3:[{rank,title,image,lprice,mall,link,item}]}]
   isSearching: false,
+  cancelRequested: false,  // 취소 플래그
 };
 
 /* 드래그앤드롭 초기화 */
@@ -1251,11 +1252,10 @@ function handleExcelFile(file) {
       var ws   = wb.Sheets[wb.SheetNames[0]];
       var rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
 
-      // A열(index 0) 값 추출, 헤더 제거, 빈값 제거, 최대 200개
+      // A열(index 0) 값 추출, 빈값 제거, 최대 200개
       var names = [];
-      rows.forEach(function(row, i) {
+      rows.forEach(function(row) {
         var val = String(row[0] || '').trim();
-        // 1행이 헤더처럼 보이면(숫자 아닌 한글/영문) 제외 여부는 그냥 포함
         if (val && val.length > 0) names.push(val);
       });
       names = names.slice(0, 200);
@@ -1266,7 +1266,7 @@ function handleExcelFile(file) {
       }
       excelState.items   = names;
       excelState.results = [];
-      _renderExcelPreview(names);
+      _renderExcelPreview(names, file.name);
     } catch(err) {
       showToast('⚠️ 파일 읽기 실패: ' + err.message);
     }
@@ -1275,25 +1275,30 @@ function handleExcelFile(file) {
 }
 
 /* 미리보기 렌더링 */
-function _renderExcelPreview(names) {
-  document.getElementById('excelPreviewWrap').style.display = 'block';
-  document.getElementById('excelResultWrap').style.display  = 'none';
+function _renderExcelPreview(names, fileName) {
+  document.getElementById('excelPreviewWrap').style.display  = 'block';
+  document.getElementById('excelResultWrap').style.display   = 'none';
   document.getElementById('excelProgressWrap').style.display = 'none';
 
-  document.getElementById('excelPreviewCount').textContent =
-    '📋 인식된 상품 ' + names.length + '개 (최대 200개)';
+  var validCount = names.filter(function(n) { return n.length >= 2; }).length;
+  document.getElementById('excelPreviewCount').innerHTML =
+    '📋 <strong>' + names.length + '개</strong> 상품 인식' +
+    (fileName ? ' <span class="file-name-badge">' + escHtml(fileName) + '</span>' : '') +
+    (validCount < names.length ? ' <span style="color:#e53935;font-size:12px;">(너무 짧은 이름 ' + (names.length - validCount) + '개 제외)</span>' : '');
 
   var list = document.getElementById('excelPreviewList');
   list.innerHTML = '';
-  names.forEach(function(name) {
+  names.forEach(function(name, i) {
+    var invalid = name.length < 2;
     var chip = document.createElement('span');
-    chip.className = 'excel-preview-chip' + (name.length < 2 ? ' invalid' : '');
-    chip.textContent = name;
+    chip.className = 'excel-preview-chip' + (invalid ? ' invalid' : '');
+    chip.title = invalid ? '검색에서 제외됩니다 (너무 짧음)' : name;
+    chip.textContent = (i + 1) + '. ' + name;
     list.appendChild(chip);
   });
 
   var btn = document.getElementById('excelSearchAllBtn');
-  if (btn) btn.disabled = false;
+  if (btn) { btn.disabled = false; btn.textContent = '🔍 전체 최저가 검색 시작 (' + validCount + '개)'; }
 }
 
 /* 전체 일괄 검색 시작 */
@@ -1302,59 +1307,102 @@ async function startExcelBulkSearch() {
   var names = excelState.items.filter(function(n) { return n.length >= 2; });
   if (names.length === 0) { showToast('⚠️ 유효한 상품명이 없습니다'); return; }
 
-  excelState.isSearching = true;
-  excelState.results = [];
+  excelState.isSearching    = true;
+  excelState.cancelRequested = false;
+  excelState.results        = [];
 
-  // 버튼 비활성화
-  var btn = document.getElementById('excelSearchAllBtn');
-  if (btn) btn.disabled = true;
+  // 버튼 상태 변경
+  var startBtn = document.getElementById('excelSearchAllBtn');
+  if (startBtn) startBtn.style.display = 'none';
+  var cancelBtn = document.getElementById('excelCancelBtn');
+  if (cancelBtn) cancelBtn.style.display = 'inline-flex';
 
   // 진행바 표시
   document.getElementById('excelProgressWrap').style.display = 'block';
   document.getElementById('excelResultWrap').style.display   = 'none';
-  _updateExcelProgress(0, names.length);
+  _updateExcelProgress(0, names.length, '');
 
   for (var i = 0; i < names.length; i++) {
+    // 취소 체크
+    if (excelState.cancelRequested) {
+      showToast('⛔ 검색이 취소됐습니다 (' + i + '/' + names.length + '개 완료)');
+      break;
+    }
+
     var name = names[i];
+    _updateExcelProgress(i, names.length, name);
+
     try {
       var data = await apiSearch(name, 'asc', 1, 5, ''); // 낮은가격순 5개
-      var items = (data.items || []).slice(0, 3);        // Top3만 사용
-      var top3 = items.map(function(it, idx) {
+      var apiItems = (data.items || []).slice(0, 3);      // Top3만 사용
+      var top3 = apiItems.map(function(it, idx) {
         return {
           rank:   idx + 1,
-          title:  it.title  || name,
+          title:  it.title  || name,    // ← 실제 API 상품명
+          image:  it.image  || '',       // ← 실제 썸네일
           lprice: it.lprice || 0,
           mall:   it.mall   || '',
           link:   it.link   || '#',
+          item:   it,                    // 전체 아이템 보존 (상세이동용)
         };
       });
       if (top3.length === 0) {
-        top3 = [{ rank: 1, title: '검색결과 없음', lprice: 0, mall: '-', link: '#' }];
+        top3 = [{ rank: 1, title: '검색결과 없음', image: '', lprice: 0, mall: '-', link: '#', item: null }];
       }
       excelState.results.push({ name: name, top3: top3 });
     } catch(e) {
-      excelState.results.push({ name: name, top3: [{ rank:1, title:'API 오류', lprice:0, mall:'-', link:'#' }] });
+      excelState.results.push({ name: name, top3: [{ rank:1, title:'API 오류', image:'', lprice:0, mall:'-', link:'#', item:null }] });
     }
-    _updateExcelProgress(i + 1, names.length);
-    // API 부하 방지: 100ms 간격
+
+    _updateExcelProgress(i + 1, names.length, name);
+    // API 부하 방지: 120ms 간격
     await new Promise(function(r) { setTimeout(r, 120); });
   }
 
   excelState.isSearching = false;
-  _renderExcelResults(excelState.results);
+
+  // 버튼 복구
+  if (cancelBtn) cancelBtn.style.display = 'none';
+  if (startBtn)  startBtn.style.display  = 'inline-flex';
+
+  if (excelState.results.length > 0) {
+    _renderExcelResults(excelState.results);
+  }
+}
+
+/* 검색 취소 */
+function cancelExcelSearch() {
+  if (!excelState.isSearching) return;
+  excelState.cancelRequested = true;
+  var cancelBtn = document.getElementById('excelCancelBtn');
+  if (cancelBtn) { cancelBtn.disabled = true; cancelBtn.textContent = '⏳ 취소 중...'; }
 }
 
 /* 진행 상태 업데이트 */
-function _updateExcelProgress(done, total) {
+function _updateExcelProgress(done, total, currentName) {
   var pct = total > 0 ? Math.round((done / total) * 100) : 0;
-  document.getElementById('excelProgressBar').style.width = pct + '%';
-  document.getElementById('excelProgressText').textContent = done + ' / ' + total + ' (' + pct + '%)';
+  var bar = document.getElementById('excelProgressBar');
+  var txt = document.getElementById('excelProgressText');
+  var cur = document.getElementById('excelProgressCurrent');
+  if (bar) bar.style.width = pct + '%';
+  if (txt) txt.textContent = done + ' / ' + total + ' (' + pct + '%)';
+  if (cur && currentName) cur.textContent = '🔍 검색 중: ' + currentName;
 }
 
 /* 결과 테이블 렌더링 */
 function _renderExcelResults(results) {
   document.getElementById('excelProgressWrap').style.display = 'none';
   document.getElementById('excelResultWrap').style.display   = 'block';
+
+  // 완료 통계 업데이트
+  var titleEl = document.querySelector('.excel-result-title');
+  if (titleEl) {
+    var noResultCount = results.filter(function(r) {
+      return r.top3[0] && (r.top3[0].title === '검색결과 없음' || r.top3[0].title === 'API 오류');
+    }).length;
+    titleEl.innerHTML = '✅ 검색 완료 <span class="result-stat">' + results.length + '개 상품</span>' +
+      (noResultCount > 0 ? ' <span class="result-stat-warn">결과없음 ' + noResultCount + '개</span>' : '');
+  }
 
   var tbody = document.getElementById('excelResultBody');
   tbody.innerHTML = '';
@@ -1363,47 +1411,115 @@ function _renderExcelResults(results) {
     item.top3.forEach(function(row, rankIdx) {
       var tr = document.createElement('tr');
       if (rankIdx === 0) tr.classList.add('product-group-start');
-      if (row.title === '검색결과 없음' || row.title === 'API 오류') tr.classList.add('row-error');
 
-      var noCell = rankIdx === 0
-        ? '<td class="col-no" rowspan="' + item.top3.length + '">' + (idx+1) + '</td>'
-        : '';
-      var nameCell = rankIdx === 0
-        ? '<td class="col-name" rowspan="' + item.top3.length + '">' + escHtml(item.name) + '</td>'
-        : '';
+      var isError = (row.title === '검색결과 없음' || row.title === 'API 오류');
+      if (isError) tr.classList.add('row-error');
 
-      var rankBadge = '<span class="rank-badge rank-' + row.rank + '">' + row.rank + '</span>';
-      var priceStr  = row.lprice > 0
-        ? '<span class="excel-price' + (row.rank===1 ? ' best' : '') + '">' + row.lprice.toLocaleString() + '원</span>'
+      // No + 검색어 셀 (rowspan)
+      if (rankIdx === 0) {
+        var noTd = document.createElement('td');
+        noTd.className = 'col-no';
+        noTd.rowSpan = item.top3.length;
+        noTd.textContent = idx + 1;
+        tr.appendChild(noTd);
+
+        var nameTd = document.createElement('td');
+        nameTd.className = 'col-name';
+        nameTd.rowSpan = item.top3.length;
+        nameTd.innerHTML = '<span class="search-keyword">' + escHtml(item.name) + '</span>';
+        tr.appendChild(nameTd);
+      }
+
+      // 순위 배지
+      var rankTd = document.createElement('td');
+      rankTd.className = 'col-rank';
+      rankTd.innerHTML = '<span class="rank-badge rank-' + row.rank + '">' + row.rank + '</span>';
+      tr.appendChild(rankTd);
+
+      // 썸네일 + 실제 상품명
+      var productTd = document.createElement('td');
+      productTd.className = 'col-product';
+      if (isError) {
+        productTd.innerHTML = '<span style="color:#aaa;">' + escHtml(row.title) + '</span>';
+      } else {
+        var imgHtml = row.image
+          ? '<img src="' + escHtml(row.image) + '" class="excel-thumb" alt="" onerror="this.style.display=\'none\'">'
+          : '<div class="excel-thumb-placeholder"></div>';
+        var titleText = row.title.length > 40 ? row.title.slice(0, 40) + '…' : row.title;
+        productTd.innerHTML =
+          '<div class="excel-product-cell">' + imgHtml +
+          '<span class="excel-product-title" title="' + escHtml(row.title) + '">' + escHtml(titleText) + '</span>' +
+          '</div>';
+        // 클릭 시 상세 페이지 이동
+        if (row.item) {
+          var savedItem = row.item;
+          productTd.querySelector('.excel-product-cell').style.cursor = 'pointer';
+          productTd.querySelector('.excel-product-cell').addEventListener('click', function() {
+            _registerItem(savedItem);
+            showDetail(savedItem);
+          });
+        }
+      }
+      tr.appendChild(productTd);
+
+      // 최저가
+      var priceTd = document.createElement('td');
+      priceTd.className = 'col-price';
+      priceTd.innerHTML = row.lprice > 0
+        ? '<span class="excel-price' + (row.rank === 1 ? ' best' : '') + '">' + row.lprice.toLocaleString() + '원</span>'
         : '<span style="color:#aaa">-</span>';
-      var linkBtn   = row.link !== '#' && row.lprice > 0
-        ? '<a href="' + row.link + '" target="_blank" rel="noopener" class="excel-link-btn">보기 →</a>'
-        : '';
+      tr.appendChild(priceTd);
 
-      tr.innerHTML = noCell + nameCell +
-        '<td class="col-rank">' + rankBadge + '</td>' +
-        '<td class="col-price">' + priceStr + '</td>' +
-        '<td class="col-mall">'  + escHtml(row.mall)  + '</td>' +
-        '<td class="col-link">'  + linkBtn + '</td>';
+      // 쇼핑몰
+      var mallTd = document.createElement('td');
+      mallTd.className = 'col-mall';
+      mallTd.textContent = row.mall;
+      tr.appendChild(mallTd);
+
+      // 바로가기 버튼
+      var linkTd = document.createElement('td');
+      linkTd.className = 'col-link';
+      if (row.link !== '#' && row.lprice > 0) {
+        linkTd.innerHTML = '<a href="' + escHtml(row.link) + '" target="_blank" rel="noopener" class="excel-link-btn">보기 →</a>';
+      }
+      tr.appendChild(linkTd);
 
       tbody.appendChild(tr);
     });
   });
 }
 
-/* 결과 엑셀 다운로드 */
+/* 결과 엑셀 다운로드 (개선: 썸네일URL 포함) */
 function exportExcelResult() {
-  if (!excelState.results.length) return;
-  var rows = [['No', '검색 상품명', '순위', '최저가(원)', '쇼핑몰', '링크']];
+  if (!excelState.results.length) { showToast('⚠️ 검색 결과가 없습니다'); return; }
+
+  var rows = [['No', '검색 상품명', '순위', '실제 상품명', '최저가(원)', '쇼핑몰', '상품 링크', '이미지 URL']];
   excelState.results.forEach(function(item, idx) {
     item.top3.forEach(function(row) {
-      rows.push([idx+1, item.name, row.rank, row.lprice, row.mall, row.link]);
+      rows.push([
+        idx + 1,
+        item.name,
+        row.rank,
+        row.title,
+        row.lprice,
+        row.mall,
+        row.link !== '#' ? row.link : '',
+        row.image || '',
+      ]);
     });
   });
+
   var ws = XLSX.utils.aoa_to_sheet(rows);
+
+  // 열 너비 지정
+  ws['!cols'] = [
+    {wch:5}, {wch:25}, {wch:5}, {wch:45}, {wch:12}, {wch:15}, {wch:50}, {wch:60}
+  ];
+
   var wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, '최저가검색결과');
   XLSX.writeFile(wb, '싸카_최저가검색_' + new Date().toISOString().slice(0,10) + '.xlsx');
+  showToast('📥 결과 엑셀 다운로드 완료! (' + excelState.results.length + '개 상품)');
 }
 
 /* 예시 양식 다운로드 */
@@ -1411,26 +1527,36 @@ function downloadExcelTemplate() {
   var rows = [
     ['상품명'],
     ['아디다스 레알마드리드 유니폼'],
-    ['나이키 축구화'],
+    ['나이키 메르쿠리알 축구화'],
     ['오클리 선글라스'],
-    ['국가대표 유니폼'],
+    ['대한민국 국가대표 유니폼'],
     ['푸마 트레이닝복'],
+    ['살로몬 트레일화'],
+    ['언더아머 압박 레깅스'],
   ];
   var ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [{wch: 35}];
   var wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, '상품목록');
   XLSX.writeFile(wb, '싸카_검색양식_예시.xlsx');
+  showToast('📥 예시 양식 다운로드 완료');
 }
 
 /* 초기화 */
 function resetExcelPage() {
-  excelState.items   = [];
-  excelState.results = [];
-  excelState.isSearching = false;
+  excelState.items          = [];
+  excelState.results        = [];
+  excelState.isSearching    = false;
+  excelState.cancelRequested = false;
   document.getElementById('excelPreviewWrap').style.display  = 'none';
   document.getElementById('excelProgressWrap').style.display = 'none';
   document.getElementById('excelResultWrap').style.display   = 'none';
   document.getElementById('excelFileInput').value = '';
+  // 버튼 복구
+  var startBtn = document.getElementById('excelSearchAllBtn');
+  var cancelBtn = document.getElementById('excelCancelBtn');
+  if (startBtn)  { startBtn.style.display = 'inline-flex'; startBtn.disabled = false; startBtn.textContent = '🔍 전체 최저가 검색 시작'; }
+  if (cancelBtn) { cancelBtn.style.display = 'none'; cancelBtn.disabled = false; cancelBtn.textContent = '⛔ 검색 취소'; }
 }
 
 /* ===== 초기 로드 ===== */

@@ -1790,28 +1790,21 @@ input { outline: none; border: none; }
 }
 
 /* 진행 상태 바 */
-.excel-progress-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  font-size: 14px;
-  font-weight: 600;
-}
-.excel-progress-title { color: var(--blue); }
+/* .excel-progress-header → 하단 신규 스타일로 재정의됨 */
+.excel-progress-title { color: var(--blue); font-size: 14px; font-weight: 700; }
 .excel-progress-bar-bg {
   width: 100%;
-  height: 10px;
+  height: 12px;
   background: #e2eaf8;
   border-radius: 10px;
   overflow: hidden;
-  margin-bottom: 28px;
+  margin-bottom: 6px;
 }
 .excel-progress-bar {
   height: 100%;
   background: linear-gradient(90deg, var(--blue), #00c6ff);
   border-radius: 10px;
-  transition: width 0.3s ease;
+  transition: width 0.4s ease;
 }
 
 /* 결과 테이블 */
@@ -1924,17 +1917,157 @@ input { outline: none; border: none; }
 /* 오류 행 */
 .excel-result-table tr.row-error td { color: #c0392b; }
 
-/* 상품명 컬럼 */
-.col-name { min-width: 200px; }
-.col-no   { width: 50px; }
-.col-rank { width: 60px; text-align: center; }
-.col-price { width: 120px; }
-.col-mall  { width: 130px; }
-.col-link  { width: 90px; }
+/* 컬럼 너비 */
+.col-no      { width: 46px; text-align: center; }
+.col-name    { min-width: 140px; max-width: 180px; }
+.col-rank    { width: 56px; text-align: center; }
+.col-product { min-width: 220px; }
+.col-price   { width: 110px; }
+.col-mall    { width: 110px; }
+.col-link    { width: 82px; }
+
+/* 검색 키워드 셀 */
+.search-keyword {
+  display: inline-block;
+  background: #EBF5FF;
+  color: #1565C0;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid #BBDEFB;
+  word-break: break-all;
+  line-height: 1.4;
+}
+
+/* 실제 상품 셀 (썸네일 + 상품명) */
+.excel-product-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.excel-product-cell:hover .excel-product-title { color: var(--blue); text-decoration: underline; }
+
+.excel-thumb {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--gray-200);
+  flex-shrink: 0;
+  background: #f5f5f5;
+}
+.excel-thumb-placeholder {
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  background: var(--gray-100);
+  flex-shrink: 0;
+}
+.excel-product-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  line-height: 1.4;
+  word-break: break-all;
+  transition: color 0.15s;
+}
+
+/* 파일명 배지 */
+.file-name-badge {
+  display: inline-block;
+  background: #E8F5E9;
+  color: #2E7D32;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid #C8E6C9;
+  margin-left: 6px;
+}
+
+/* 취소 버튼 */
+.excel-cancel-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: #FFF3E0;
+  border: 1.5px solid #FFB300;
+  border-radius: 8px;
+  color: #E65100;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.excel-cancel-btn:hover { background: #FFE0B2; border-color: #E65100; }
+.excel-cancel-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* 진행 상태 레이아웃 개선 */
+.excel-progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.excel-progress-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.excel-progress-count {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--blue-dark);
+  background: #EBF5FF;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+.excel-progress-current {
+  font-size: 12px;
+  color: #555;
+  margin-top: 6px;
+  padding: 4px 10px;
+  background: #F5F5F5;
+  border-radius: 6px;
+  min-height: 24px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 결과 통계 배지 */
+.result-stat {
+  display: inline-block;
+  background: #E8F5E9;
+  color: #2E7D32;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: 6px;
+}
+.result-stat-warn {
+  display: inline-block;
+  background: #FFF3E0;
+  color: #E65100;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: 4px;
+}
 
 @media (max-width: 600px) {
   .excel-result-table { font-size: 12px; }
   .excel-result-table th,
-  .excel-result-table td { padding: 9px 8px; }
-  .col-name { min-width: 120px; }
+  .excel-result-table td { padding: 8px 6px; }
+  .col-name    { min-width: 90px; max-width: 110px; }
+  .col-product { min-width: 130px; }
+  .excel-thumb { width: 32px; height: 32px; }
+  .excel-progress-current { font-size: 11px; }
 }
