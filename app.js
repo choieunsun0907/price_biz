@@ -1213,14 +1213,18 @@ const excelState = {
 
 /* 드래그앤드롭 초기화 */
 document.addEventListener('DOMContentLoaded', function() {
-  const zone = document.getElementById('excelDropZone');
+  var zone = document.getElementById('excelDropZone');
   if (!zone) return;
+
   zone.addEventListener('dragover', function(e) {
     e.preventDefault();
     zone.classList.add('drag-over');
   });
-  zone.addEventListener('dragleave', function() {
-    zone.classList.remove('drag-over');
+  zone.addEventListener('dragleave', function(e) {
+    // zone 영역을 완전히 벗어날 때만 drag-over 제거
+    if (!zone.contains(e.relatedTarget)) {
+      zone.classList.remove('drag-over');
+    }
   });
   zone.addEventListener('drop', function(e) {
     e.preventDefault();
@@ -1229,25 +1233,40 @@ document.addEventListener('DOMContentLoaded', function() {
     if (file) handleExcelFile(file);
   });
   zone.addEventListener('click', function(e) {
-    if (e.target.tagName !== 'BUTTON') {
-      document.getElementById('excelFileInput').click();
-    }
+    // BUTTON이나 INPUT 클릭은 무시 (이미 자체 onclick 처리)
+    var tag = e.target.tagName;
+    if (tag === 'BUTTON' || tag === 'INPUT' || tag === 'A') return;
+    document.getElementById('excelFileInput').click();
   });
 });
 
 /* 파일 처리 */
 function handleExcelFile(file) {
   if (!file) return;
-  var ext = file.name.split('.').pop().toLowerCase();
-  if (!['xlsx','xls','csv'].includes(ext)) {
-    showToast('⚠️ .xlsx, .xls, .csv 파일만 지원합니다');
+
+  // XLSX 라이브러리 로드 확인
+  if (typeof XLSX === 'undefined') {
+    showToast('⚠️ 엑셀 라이브러리 로딩 중입니다. 잠시 후 다시 시도해주세요.');
     return;
   }
 
+  var ext = file.name.split('.').pop().toLowerCase();
+  if (!['xlsx','xls','csv'].includes(ext)) {
+    showToast('⚠️ .xlsx, .xls, .csv 파일만 지원합니다');
+    // input 초기화 (같은 파일 재선택 가능하도록)
+    var inp = document.getElementById('excelFileInput');
+    if (inp) inp.value = '';
+    return;
+  }
+
+  // 업로드존 비활성화 (파싱 중 중복 클릭 방지)
+  var zone = document.getElementById('excelDropZone');
+  if (zone) zone.style.pointerEvents = 'none';
+
   var reader = new FileReader();
-  reader.onload = function(e) {
+  reader.onload = function(evt) {
     try {
-      var data = new Uint8Array(e.target.result);
+      var data = new Uint8Array(evt.target.result);
       var wb   = XLSX.read(data, { type: 'array' });
       var ws   = wb.Sheets[wb.SheetNames[0]];
       var rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
@@ -1262,6 +1281,7 @@ function handleExcelFile(file) {
 
       if (names.length === 0) {
         showToast('⚠️ A열에 상품명이 없습니다. 파일을 확인해주세요.');
+        if (zone) zone.style.pointerEvents = '';
         return;
       }
       excelState.items   = names;
@@ -1269,7 +1289,17 @@ function handleExcelFile(file) {
       _renderExcelPreview(names, file.name);
     } catch(err) {
       showToast('⚠️ 파일 읽기 실패: ' + err.message);
+    } finally {
+      // 업로드존 다시 활성화
+      if (zone) zone.style.pointerEvents = '';
+      // input 초기화 (같은 파일 재선택 가능)
+      var inp = document.getElementById('excelFileInput');
+      if (inp) inp.value = '';
     }
+  };
+  reader.onerror = function() {
+    showToast('⚠️ 파일을 읽을 수 없습니다.');
+    if (zone) zone.style.pointerEvents = '';
   };
   reader.readAsArrayBuffer(file);
 }
@@ -1307,66 +1337,70 @@ async function startExcelBulkSearch() {
   var names = excelState.items.filter(function(n) { return n.length >= 2; });
   if (names.length === 0) { showToast('⚠️ 유효한 상품명이 없습니다'); return; }
 
-  excelState.isSearching    = true;
+  excelState.isSearching     = true;
   excelState.cancelRequested = false;
-  excelState.results        = [];
+  excelState.results         = [];
 
   // 버튼 상태 변경
-  var startBtn = document.getElementById('excelSearchAllBtn');
-  if (startBtn) startBtn.style.display = 'none';
+  var startBtn  = document.getElementById('excelSearchAllBtn');
   var cancelBtn = document.getElementById('excelCancelBtn');
-  if (cancelBtn) cancelBtn.style.display = 'inline-flex';
+  if (startBtn)  startBtn.style.display  = 'none';
+  if (cancelBtn) { cancelBtn.style.display = 'inline-flex'; cancelBtn.disabled = false; cancelBtn.textContent = '⛔ 검색 취소'; }
 
-  // 진행바 표시
+  // 진행바 표시, 미리보기/결과는 숨김
   document.getElementById('excelProgressWrap').style.display = 'block';
   document.getElementById('excelResultWrap').style.display   = 'none';
   _updateExcelProgress(0, names.length, '');
 
-  for (var i = 0; i < names.length; i++) {
-    // 취소 체크
-    if (excelState.cancelRequested) {
-      showToast('⛔ 검색이 취소됐습니다 (' + i + '/' + names.length + '개 완료)');
-      break;
-    }
-
-    var name = names[i];
-    _updateExcelProgress(i, names.length, name);
-
-    try {
-      var data = await apiSearch(name, 'asc', 1, 5, ''); // 낮은가격순 5개
-      var apiItems = (data.items || []).slice(0, 3);      // Top3만 사용
-      var top3 = apiItems.map(function(it, idx) {
-        return {
-          rank:   idx + 1,
-          title:  it.title  || name,    // ← 실제 API 상품명
-          image:  it.image  || '',       // ← 실제 썸네일
-          lprice: it.lprice || 0,
-          mall:   it.mall   || '',
-          link:   it.link   || '#',
-          item:   it,                    // 전체 아이템 보존 (상세이동용)
-        };
-      });
-      if (top3.length === 0) {
-        top3 = [{ rank: 1, title: '검색결과 없음', image: '', lprice: 0, mall: '-', link: '#', item: null }];
+  try {
+    for (var i = 0; i < names.length; i++) {
+      // 취소 체크
+      if (excelState.cancelRequested) {
+        showToast('⛔ 검색이 취소됐습니다 (' + i + '/' + names.length + '개 완료)');
+        break;
       }
-      excelState.results.push({ name: name, top3: top3 });
-    } catch(e) {
-      excelState.results.push({ name: name, top3: [{ rank:1, title:'API 오류', image:'', lprice:0, mall:'-', link:'#', item:null }] });
+
+      var name = names[i];
+      _updateExcelProgress(i, names.length, name);
+
+      try {
+        var data = await apiSearch(name, 'asc', 1, 5, ''); // 낮은가격순 5개
+        var apiItems = (data.items || []).slice(0, 3);      // Top3만 사용
+        var top3 = apiItems.map(function(it, idx) {
+          return {
+            rank:   idx + 1,
+            title:  it.title  || name,
+            image:  it.image  || '',
+            lprice: it.lprice || 0,
+            mall:   it.mall   || '',
+            link:   it.link   || '#',
+            item:   it,
+          };
+        });
+        if (top3.length === 0) {
+          top3 = [{ rank: 1, title: '검색결과 없음', image: '', lprice: 0, mall: '-', link: '#', item: null }];
+        }
+        excelState.results.push({ name: name, top3: top3 });
+      } catch(apiErr) {
+        excelState.results.push({ name: name, top3: [{ rank:1, title:'API 오류', image:'', lprice:0, mall:'-', link:'#', item:null }] });
+      }
+
+      _updateExcelProgress(i + 1, names.length, name);
+      // API 부하 방지: 120ms 간격
+      await new Promise(function(r) { setTimeout(r, 120); });
     }
+  } finally {
+    // 항상 실행: 상태 복구
+    excelState.isSearching = false;
+    if (cancelBtn) cancelBtn.style.display = 'none';
+    if (startBtn)  { startBtn.style.display = 'inline-flex'; startBtn.disabled = false; }
 
-    _updateExcelProgress(i + 1, names.length, name);
-    // API 부하 방지: 120ms 간격
-    await new Promise(function(r) { setTimeout(r, 120); });
-  }
-
-  excelState.isSearching = false;
-
-  // 버튼 복구
-  if (cancelBtn) cancelBtn.style.display = 'none';
-  if (startBtn)  startBtn.style.display  = 'inline-flex';
-
-  if (excelState.results.length > 0) {
-    _renderExcelResults(excelState.results);
+    // 결과가 있으면 테이블 표시, 없으면 진행바 숨김
+    if (excelState.results.length > 0) {
+      _renderExcelResults(excelState.results);
+    } else {
+      document.getElementById('excelProgressWrap').style.display = 'none';
+    }
   }
 }
 
