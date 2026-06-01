@@ -1214,7 +1214,20 @@ const excelState = {
 /* 드래그앤드롭 초기화 - input은 항상 DOM에 유지하므로 한 번만 등록 */
 document.addEventListener('DOMContentLoaded', function() {
   var zone = document.getElementById('excelDropZone');
+  var inp  = document.getElementById('excelFileInput');
   if (!zone) return;
+
+  /* ── file input change 이벤트: 인라인 onchange 대신 addEventListener 사용 ──
+     이유: 인라인 onchange는 일부 브라우저에서 같은 파일 재선택 시 발동 안 됨.
+     addEventListener + inp.value='' 조합이 가장 안전함. */
+  if (inp) {
+    inp.addEventListener('change', function() {
+      var file = this.files && this.files[0];
+      /* value 즉시 초기화 → 같은 파일 또는 재업로드 시 change 항상 발동 */
+      this.value = '';
+      if (file) handleExcelFile(file);
+    });
+  }
 
   zone.addEventListener('dragover', function(e) {
     e.preventDefault();
@@ -1238,11 +1251,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // 완료 뷰가 표시 중일 땐 zone 클릭 무시
     var doneView = document.getElementById('uploadDoneView');
     if (doneView && doneView.style.display !== 'none') return;
-    document.getElementById('excelFileInput').click();
+    if (inp) inp.click();
   });
 });
 
-/* 파일 처리 */
+/* 파일 처리
+   ※ inp.value 초기화는 change 이벤트 핸들러(DOMContentLoaded)에서 처리.
+      여기서는 File 객체만 받아서 파싱 수행. */
 function handleExcelFile(file) {
   if (!file) return;
 
@@ -1255,13 +1270,10 @@ function handleExcelFile(file) {
   var ext = file.name.split('.').pop().toLowerCase();
   if (!['xlsx','xls','csv'].includes(ext)) {
     showToast('⚠️ .xlsx, .xls, .csv 파일만 지원합니다');
-    // input 초기화 (같은 파일 재선택 가능하도록)
-    var inp = document.getElementById('excelFileInput');
-    if (inp) inp.value = '';
     return;
   }
 
-  // 업로드존 비활성화 (파싱 중 중복 클릭 방지)
+  // 업로드존 비활성화 (파싱 중 중복 업로드 방지)
   var zone = document.getElementById('excelDropZone');
   if (zone) zone.style.pointerEvents = 'none';
 
@@ -1283,22 +1295,18 @@ function handleExcelFile(file) {
 
       if (names.length === 0) {
         showToast('⚠️ A열에 상품명이 없습니다. 파일을 확인해주세요.');
-        if (zone) zone.style.pointerEvents = '';
-        return;
+        return;  // finally에서 zone 복원됨
       }
       excelState.items   = names;
       excelState.results = [];
       _renderExcelPreview(names, file.name);
-      // 업로드 완료 후 업로드존 축소 + 스크롤
+      // 업로드 완료 → 업로드존 축소 + 스크롤
       _collapseUploadZone(file.name);
     } catch(err) {
       showToast('⚠️ 파일 읽기 실패: ' + err.message);
     } finally {
-      // 업로드존 다시 활성화
+      // 업로드존 포인터 이벤트 반드시 복원 (성공·실패·빈파일 모두)
       if (zone) zone.style.pointerEvents = '';
-      // input 초기화 (같은 파일 재선택 가능)
-      var inp = document.getElementById('excelFileInput');
-      if (inp) inp.value = '';
     }
   };
   reader.onerror = function() {
