@@ -1211,7 +1211,7 @@ const excelState = {
   cancelRequested: false,  // 취소 플래그
 };
 
-/* 드래그앤드롭 초기화 */
+/* 드래그앤드롭 초기화 - input은 항상 DOM에 유지하므로 한 번만 등록 */
 document.addEventListener('DOMContentLoaded', function() {
   var zone = document.getElementById('excelDropZone');
   if (!zone) return;
@@ -1221,7 +1221,6 @@ document.addEventListener('DOMContentLoaded', function() {
     zone.classList.add('drag-over');
   });
   zone.addEventListener('dragleave', function(e) {
-    // zone 영역을 완전히 벗어날 때만 drag-over 제거
     if (!zone.contains(e.relatedTarget)) {
       zone.classList.remove('drag-over');
     }
@@ -1233,9 +1232,12 @@ document.addEventListener('DOMContentLoaded', function() {
     if (file) handleExcelFile(file);
   });
   zone.addEventListener('click', function(e) {
-    // BUTTON이나 INPUT 클릭은 무시 (이미 자체 onclick 처리)
+    // BUTTON·INPUT·A 클릭은 자체 처리
     var tag = e.target.tagName;
     if (tag === 'BUTTON' || tag === 'INPUT' || tag === 'A') return;
+    // 완료 뷰가 표시 중일 땐 zone 클릭 무시
+    var doneView = document.getElementById('uploadDoneView');
+    if (doneView && doneView.style.display !== 'none') return;
     document.getElementById('excelFileInput').click();
   });
 });
@@ -1306,26 +1308,29 @@ function handleExcelFile(file) {
   reader.readAsArrayBuffer(file);
 }
 
-/* 업로드 완료 후 업로드존 축소 */
+/* 업로드 완료 후 업로드존 축소 - innerHTML 교체 없이 CSS 토글 */
 function _collapseUploadZone(fileName) {
-  var zone = document.getElementById('excelDropZone');
+  var zone        = document.getElementById('excelDropZone');
+  var defaultView = document.getElementById('uploadDefaultView');
+  var doneView    = document.getElementById('uploadDoneView');
+  var doneText    = document.getElementById('uploadDoneFileName');
   if (!zone) return;
-  zone.innerHTML =
-    '<div class="excel-upload-collapsed">' +
-    '<span class="upload-done-icon">✅</span>' +
-    '<span class="upload-done-text">' + escHtml(fileName) + ' 업로드 완료</span>' +
-    '<button class="upload-reselect-btn" onclick="resetExcelPage()">↩ 다시 선택</button>' +
-    '<input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleExcelFile(this.files[0])">' +
-    '</div>';
-  zone.style.padding    = '14px 20px';
-  zone.style.cursor     = 'default';
-  zone.style.background = '#f0faf0';
+
+  // 완료 상태로 전환
+  if (defaultView) defaultView.style.display = 'none';
+  if (doneView)    doneView.style.display     = 'flex';
+  if (doneText)    doneText.textContent       = '✅ ' + fileName + ' 업로드 완료';
+
+  zone.style.padding     = '14px 20px';
+  zone.style.cursor      = 'default';
+  zone.style.background  = '#f0faf0';
   zone.style.borderColor = '#66bb6a';
+
   // 미리보기 영역으로 스크롤
   setTimeout(function() {
     var preview = document.getElementById('excelPreviewWrap');
     if (preview) preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 100);
+  }, 120);
 }
 
 /* 미리보기 렌더링 */
@@ -1618,16 +1623,19 @@ function resetExcelPage() {
   _restoreUploadZone();
 }
 
-/* 업로드존 원래 상태로 복원 */
+/* 업로드존 원래 상태로 복원 - CSS 토글만 */
 function _restoreUploadZone() {
-  var zone = document.getElementById('excelDropZone');
+  var zone        = document.getElementById('excelDropZone');
+  var defaultView = document.getElementById('uploadDefaultView');
+  var doneView    = document.getElementById('uploadDoneView');
+  var inp         = document.getElementById('excelFileInput');
   if (!zone) return;
-  zone.innerHTML =
-    '<div class="excel-upload-icon">📄</div>' +
-    '<div class="excel-upload-text">파일을 드래그하거나 클릭해서 업로드</div>' +
-    '<div class="excel-upload-sub">.xlsx · .xls · .csv 지원 &nbsp;|&nbsp; 최대 200개 상품</div>' +
-    '<input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleExcelFile(this.files[0])">' +
-    '<button class="excel-upload-btn" onclick="document.getElementById(\"excelFileInput\").click()">📂 파일 선택</button>';
+
+  // 기본 상태로 전환
+  if (defaultView) defaultView.style.display = '';
+  if (doneView)    doneView.style.display     = 'none';
+  if (inp)         inp.value                 = '';  // 같은 파일 재선택 가능
+
   zone.style.padding     = '';
   zone.style.cursor      = 'pointer';
   zone.style.background  = '';

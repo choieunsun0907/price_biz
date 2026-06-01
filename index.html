@@ -231,13 +231,24 @@
       <p class="excel-page-desc">엑셀(.xlsx/.xls) 또는 CSV 파일의 <strong>A열</strong>에 상품명을 입력 → 네이버 최저가 <strong>Top 3</strong>를 자동 조회합니다</p>
     </div>
 
-    <!-- 업로드 존 -->
+    <!-- 업로드 존 (input은 항상 유지, CSS로 상태 전환) -->
     <div class="excel-upload-zone" id="excelDropZone">
-      <div class="excel-upload-icon">📄</div>
-      <div class="excel-upload-text">파일을 드래그하거나 클릭해서 업로드</div>
-      <div class="excel-upload-sub">.xlsx · .xls · .csv 지원 &nbsp;|&nbsp; 최대 200개 상품</div>
+      <!-- 기본 상태 -->
+      <div id="uploadDefaultView">
+        <div class="excel-upload-icon">📄</div>
+        <div class="excel-upload-text">파일을 드래그하거나 클릭해서 업로드</div>
+        <div class="excel-upload-sub">.xlsx · .xls · .csv 지원 &nbsp;|&nbsp; 최대 200개 상품</div>
+        <button class="excel-upload-btn" onclick="document.getElementById('excelFileInput').click()">📂 파일 선택</button>
+      </div>
+      <!-- 완료 상태 (항상 DOM에 존재, JS로 표시/숨김) -->
+      <div id="uploadDoneView" style="display:none" class="excel-upload-collapsed">
+        <span class="upload-done-icon">✅</span>
+        <span class="upload-done-text" id="uploadDoneFileName"></span>
+        <button class="upload-reselect-btn" onclick="document.getElementById('excelFileInput').click()">📂 다른 파일 선택</button>
+        <button class="upload-reselect-btn" onclick="resetExcelPage()" style="background:#fff3f3;border-color:#ef9a9a;color:#c62828;">↩ 초기화</button>
+      </div>
+      <!-- input은 항상 DOM에 유지 (이벤트 안전) -->
       <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleExcelFile(this.files[0])">
-      <button class="excel-upload-btn" onclick="document.getElementById('excelFileInput').click()">📂 파일 선택</button>
     </div>
 
     <!-- 양식 다운로드 안내 -->
