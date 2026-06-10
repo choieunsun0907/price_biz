@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <!-- Lucide Icons (깔끔한 SVG 아이콘) -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
 <body>
 
@@ -18,21 +20,39 @@
     </a>
     <div class="search-bar-header" id="headerSearch">
       <input type="text" id="headerSearchInput" placeholder="상품명을 검색하세요..." autocomplete="off">
-      <button onclick="doSearch()" class="search-btn-sm">🔍</button>
+      <button onclick="doSearch()" class="search-btn-sm">
+        <i data-lucide="search"></i>
+      </button>
     </div>
     <nav class="header-nav">
       <a href="#" onclick="showPage('home'); return false;">홈</a>
-      <a href="#" onclick="showPage('excel'); return false;">📂 엑셀 일괄검색</a>
-      <a href="#" onclick="showPage('wishlist'); return false;">❤️ 위시리스트</a>
-      <a href="#" onclick="showPage('compare'); return false;">📊 비교</a>
+      <a href="#" onclick="showPage('excel'); return false;">
+        <i data-lucide="file-spreadsheet"></i> 엑셀 일괄검색
+      </a>
+      <a href="#" onclick="showPage('wishlist'); return false;">
+        <i data-lucide="heart"></i> 위시리스트
+      </a>
+      <a href="#" onclick="showPage('compare'); return false;">
+        <i data-lucide="bar-chart-2"></i> 비교
+      </a>
     </nav>
-    <button class="hamburger" onclick="toggleMenu()">☰</button>
+    <button class="hamburger" onclick="toggleMenu()">
+      <i data-lucide="menu"></i>
+    </button>
   </div>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="#" onclick="showPage('home'); toggleMenu(); return false;">🏠 홈</a>
-    <a href="#" onclick="showPage('excel'); toggleMenu(); return false;">📂 엑셀 일괄검색</a>
-    <a href="#" onclick="showPage('wishlist'); toggleMenu(); return false;">❤️ 위시리스트</a>
-    <a href="#" onclick="showPage('compare'); toggleMenu(); return false;">📊 비교</a>
+    <a href="#" onclick="showPage('home'); toggleMenu(); return false;">
+      <i data-lucide="home"></i> 홈
+    </a>
+    <a href="#" onclick="showPage('excel'); toggleMenu(); return false;">
+      <i data-lucide="file-spreadsheet"></i> 엑셀 일괄검색
+    </a>
+    <a href="#" onclick="showPage('wishlist'); toggleMenu(); return false;">
+      <i data-lucide="heart"></i> 위시리스트
+    </a>
+    <a href="#" onclick="showPage('compare'); toggleMenu(); return false;">
+      <i data-lucide="bar-chart-2"></i> 비교
+    </a>
   </div>
 </header>
 
@@ -48,7 +68,9 @@
       <div class="hero-search">
         <input type="text" id="heroSearchInput" placeholder="어떤 상품을 찾으세요? (예: 축구화, 오클리 선글라스...)" autocomplete="off"
                onkeypress="if(event.key==='Enter') doHeroSearch()">
-        <button onclick="doHeroSearch()" class="hero-search-btn">🔍 검색</button>
+        <button onclick="doHeroSearch()" class="hero-search-btn">
+          <i data-lucide="search"></i> 검색
+        </button>
       </div>
 
     </div>
@@ -58,14 +80,30 @@
   <section class="category-section">
     <div class="container">
       <div class="tab-row" id="categoryTabs">
-        <button class="tab-btn active" onclick="selectCategory('싸카닷컴 축구', this)">🛒 싸카닷컴</button>
-        <button class="tab-btn" onclick="selectCategory('축구화', this)">⚽ 축구화</button>
-        <button class="tab-btn" onclick="selectCategory('축구유니폼', this)">👕 축구유니폼</button>
-        <button class="tab-btn" onclick="selectCategory('축구용품', this)">🎽 축구용품</button>
-        <button class="tab-btn" onclick="selectCategory('국가대표 유니폼', this)">🇰🇷 국가대표</button>
-        <button class="tab-btn" onclick="selectCategory('트레이닝복', this)">🏃 트레이닝복</button>
-        <button class="tab-btn" onclick="selectCategory('오클리', this)">🕶️ 오클리</button>
-        <button class="tab-btn" onclick="selectCategory('선글라스', this)">😎 선글라스</button>
+        <button class="tab-btn active" onclick="selectCategory('싸카닷컴 축구', this)">
+          <i data-lucide="shopping-cart"></i> 싸카닷컴
+        </button>
+        <button class="tab-btn" onclick="selectCategory('축구화', this)">
+          <i data-lucide="footprints"></i> 축구화
+        </button>
+        <button class="tab-btn" onclick="selectCategory('축구유니폼', this)">
+          <i data-lucide="shirt"></i> 축구유니폼
+        </button>
+        <button class="tab-btn" onclick="selectCategory('축구용품', this)">
+          <i data-lucide="circle-dot"></i> 축구용품
+        </button>
+        <button class="tab-btn" onclick="selectCategory('국가대표 유니폼', this)">
+          <i data-lucide="flag"></i> 국가대표
+        </button>
+        <button class="tab-btn" onclick="selectCategory('트레이닝복', this)">
+          <i data-lucide="zap"></i> 트레이닝복
+        </button>
+        <button class="tab-btn" onclick="selectCategory('오클리', this)">
+          <i data-lucide="glasses"></i> 오클리
+        </button>
+        <button class="tab-btn" onclick="selectCategory('선글라스', this)">
+          <i data-lucide="sun"></i> 선글라스
+        </button>
       </div>
 
       <!-- 로딩 -->
@@ -79,7 +117,7 @@
 
       <!-- 더 보기 -->
       <div class="load-more-wrap" id="loadMoreWrap" style="display:none">
-        <button class="load-more-btn" onclick="loadMore()">더 보기 ↓</button>
+        <button class="load-more-btn" onclick="loadMore()">더 보기 <i data-lucide="chevron-down"></i></button>
       </div>
     </div>
   </section>
@@ -120,7 +158,7 @@
     <div class="product-grid" id="searchGrid"></div>
 
     <div class="load-more-wrap" id="searchLoadMoreWrap" style="display:none">
-      <button class="load-more-btn" onclick="loadMoreSearch()">더 보기 ↓</button>
+      <button class="load-more-btn" onclick="loadMoreSearch()">더 보기 <i data-lucide="chevron-down"></i></button>
     </div>
   </div>
 </div>
@@ -129,12 +167,22 @@
 <div id="page-detail" class="page">
   <div class="container">
     <div class="page-nav-bar">
-      <button class="back-btn" onclick="goBack()">← 이전 페이지</button>
+      <button class="back-btn" onclick="goBack()">
+        <i data-lucide="arrow-left"></i> 이전 페이지
+      </button>
       <div class="page-nav-links">
-        <button class="nav-link-btn" onclick="showPage('home')">🏠 홈</button>
-        <button class="nav-link-btn" onclick="showPage('search')">🔍 검색결과</button>
-        <button class="nav-link-btn" onclick="showPage('compare')">📊 비교</button>
-        <button class="nav-link-btn" onclick="showPage('wishlist')">❤️ 위시리스트</button>
+        <button class="nav-link-btn" onclick="showPage('home')">
+          <i data-lucide="home"></i> 홈
+        </button>
+        <button class="nav-link-btn" onclick="showPage('search')">
+          <i data-lucide="search"></i> 검색결과
+        </button>
+        <button class="nav-link-btn" onclick="showPage('compare')">
+          <i data-lucide="bar-chart-2"></i> 비교
+        </button>
+        <button class="nav-link-btn" onclick="showPage('wishlist')">
+          <i data-lucide="heart"></i> 위시리스트
+        </button>
       </div>
     </div>
     <div class="detail-wrap" id="detailContent"></div>
@@ -144,10 +192,12 @@
 <!-- ===== 위시리스트 페이지 ===== -->
 <div id="page-wishlist" class="page">
   <div class="container">
-    <h2 class="page-title">❤️ 위시리스트</h2>
+    <h2 class="page-title">
+      <i data-lucide="heart"></i> 위시리스트
+    </h2>
     <div class="product-grid" id="wishlistGrid"></div>
     <div id="wishlistEmpty" class="empty-state" style="display:none">
-      <div class="empty-icon">❤️</div>
+      <div class="empty-icon"><i data-lucide="heart" style="width:48px;height:48px;stroke:#e57373;"></i></div>
       <p>위시리스트가 비어있어요</p>
       <button onclick="showPage('home')" class="btn-primary">상품 둘러보기</button>
     </div>
@@ -161,16 +211,26 @@
     <!-- ── 비교 헤더 ── -->
     <div class="cmp-header">
       <div class="page-nav-bar">
-        <button class="back-btn" onclick="goBack()">← 이전 페이지</button>
+        <button class="back-btn" onclick="goBack()">
+          <i data-lucide="arrow-left"></i> 이전 페이지
+        </button>
         <div class="page-nav-links">
-          <button class="nav-link-btn" onclick="showPage('home')">🏠 홈</button>
-          <button class="nav-link-btn" onclick="showPage('search')">🔍 검색결과</button>
-          <button class="nav-link-btn" onclick="showPage('wishlist')">❤️ 위시리스트</button>
+          <button class="nav-link-btn" onclick="showPage('home')">
+            <i data-lucide="home"></i> 홈
+          </button>
+          <button class="nav-link-btn" onclick="showPage('search')">
+            <i data-lucide="search"></i> 검색결과
+          </button>
+          <button class="nav-link-btn" onclick="showPage('wishlist')">
+            <i data-lucide="heart"></i> 위시리스트
+          </button>
         </div>
       </div>
       <div class="cmp-header-top">
         <div class="cmp-title-group">
-          <h2 class="cmp-title">📊 상품 비교</h2>
+          <h2 class="cmp-title">
+            <i data-lucide="bar-chart-2"></i> 상품 비교
+          </h2>
           <span class="cmp-badge" id="compareCountBadge">0 / 8</span>
         </div>
         <p class="cmp-sub">최대 8개 상품 비교 · 가득 찼을 때 교체할 상품 직접 선택 · 카드 클릭 → 상품코드·가격·링크 저장</p>
@@ -193,17 +253,17 @@
       <!-- 우측: 저장/삭제 버튼 -->
       <div class="cmp-toolbar-right">
         <button class="cmp-btn cmp-btn-txt" onclick="exportSelectedText()">
-          <span class="cmp-btn-icon">📄</span>
+          <span class="cmp-btn-icon"><i data-lucide="file-text"></i></span>
           <span>텍스트 저장</span>
           <span class="cmp-btn-ext">.txt</span>
         </button>
         <button class="cmp-btn cmp-btn-csv" onclick="exportSelectedCSV()">
-          <span class="cmp-btn-icon">📊</span>
+          <span class="cmp-btn-icon"><i data-lucide="table-2"></i></span>
           <span>엑셀 저장</span>
           <span class="cmp-btn-ext">.csv</span>
         </button>
         <button class="cmp-btn cmp-btn-del" onclick="deleteSelected()">
-          <span class="cmp-btn-icon">🗑️</span>
+          <span class="cmp-btn-icon"><i data-lucide="trash-2"></i></span>
           <span>선택 삭제</span>
         </button>
       </div>
@@ -214,7 +274,7 @@
 
     <!-- ── 빈 상태 ── -->
     <div id="compareEmpty" class="cmp-empty">
-      <div class="cmp-empty-icon">📊</div>
+      <div class="cmp-empty-icon"><i data-lucide="bar-chart-2" style="width:52px;height:52px;stroke:#90a4ae;"></i></div>
       <p class="cmp-empty-title">비교할 상품이 없어요</p>
       <p class="cmp-empty-sub">상품카드에서 <strong>+ 비교하기</strong> 버튼을 눌러 추가하세요</p>
       <button onclick="showPage('home')" class="btn-primary" style="margin-top:20px;">상품 둘러보기</button>
@@ -227,7 +287,9 @@
 <div id="page-excel" class="page">
   <div class="container">
     <div class="excel-page-header">
-      <h2 class="excel-page-title">📂 엑셀 일괄 최저가 검색</h2>
+      <h2 class="excel-page-title">
+        <i data-lucide="file-spreadsheet"></i> 엑셀 일괄 최저가 검색
+      </h2>
       <p class="excel-page-desc">엑셀(.xlsx/.xls) 또는 CSV 파일의 <strong>A열</strong>에 상품명을 입력 → 네이버 최저가 <strong>Top 3</strong>를 자동 조회합니다</p>
     </div>
 
@@ -235,17 +297,27 @@
     <div class="excel-upload-zone" id="excelDropZone">
       <!-- 기본 상태 -->
       <div id="uploadDefaultView">
-        <div class="excel-upload-icon">📄</div>
+        <div class="excel-upload-icon">
+          <i data-lucide="upload-cloud" style="width:48px;height:48px;stroke:#1976d2;stroke-width:1.5;"></i>
+        </div>
         <div class="excel-upload-text">파일을 드래그하거나 클릭해서 업로드</div>
         <div class="excel-upload-sub">.xlsx · .xls · .csv 지원 &nbsp;|&nbsp; 최대 200개 상품</div>
-        <button class="excel-upload-btn" onclick="document.getElementById('excelFileInput').click()">📂 파일 선택</button>
+        <button class="excel-upload-btn" onclick="document.getElementById('excelFileInput').click()">
+          <i data-lucide="folder-open"></i> 파일 선택
+        </button>
       </div>
       <!-- 완료 상태 (항상 DOM에 존재, JS로 표시/숨김) -->
       <div id="uploadDoneView" style="display:none" class="excel-upload-collapsed">
-        <span class="upload-done-icon">✅</span>
+        <span class="upload-done-icon">
+          <i data-lucide="circle-check" style="width:22px;height:22px;stroke:#2e7d32;"></i>
+        </span>
         <span class="upload-done-text" id="uploadDoneFileName"></span>
-        <button class="upload-reselect-btn" onclick="document.getElementById('excelFileInput').click()">📂 다른 파일 선택</button>
-        <button class="upload-reselect-btn" onclick="resetExcelPage()" style="background:#fff3f3;border-color:#ef9a9a;color:#c62828;">↩ 초기화</button>
+        <button class="upload-reselect-btn" onclick="document.getElementById('excelFileInput').click()">
+          <i data-lucide="folder-open"></i> 다른 파일 선택
+        </button>
+        <button class="upload-reselect-btn upload-reset-btn" onclick="resetExcelPage()">
+          <i data-lucide="rotate-ccw"></i> 초기화
+        </button>
       </div>
       <!-- input은 항상 DOM에 유지 (이벤트 안전) -->
       <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" style="display:none">
@@ -253,8 +325,17 @@
 
     <!-- 양식 다운로드 안내 -->
     <div class="excel-template-hint">
-      💡 <strong>작성법</strong>: A열 1행부터 상품명을 한 줄씩 입력 &nbsp;|&nbsp; 헤더행(상품명) 제외하고 실제 상품명만 넣어도 됩니다
-      <button class="excel-template-btn" onclick="downloadExcelTemplate()">📥 예시 양식 다운로드</button>
+      <div class="template-hint-main">
+        <i data-lucide="info" style="width:16px;height:16px;stroke:#1565c0;flex-shrink:0;margin-top:1px;"></i>
+        <span><strong>작성법</strong>: A열 1행부터 상품명을 한 줄씩 입력 &nbsp;|&nbsp; 헤더행 없이 상품명만 입력</span>
+      </div>
+      <div class="template-hint-warning">
+        <i data-lucide="alert-triangle" style="width:15px;height:15px;stroke:#e65100;flex-shrink:0;margin-top:1px;"></i>
+        <span>샘플 양식 사용 시 <strong>1행(상품명 헤더)을 반드시 삭제</strong>한 후 업로드하세요</span>
+      </div>
+      <button class="excel-template-btn" onclick="downloadExcelTemplate()">
+        <i data-lucide="download"></i> 샘플 양식 다운로드
+      </button>
     </div>
 
     <!-- 파싱된 상품 목록 미리보기 -->
@@ -262,8 +343,12 @@
       <div class="excel-preview-header">
         <span id="excelPreviewCount"></span>
         <div class="excel-preview-actions">
-          <button class="excel-search-all-btn" id="excelSearchAllBtn" onclick="startExcelBulkSearch()">🔍 전체 최저가 검색 시작</button>
-          <button class="excel-reset-btn" onclick="resetExcelPage()">↩ 초기화</button>
+          <button class="excel-search-all-btn" id="excelSearchAllBtn" onclick="startExcelBulkSearch()">
+            <i data-lucide="search"></i> 전체 최저가 검색 시작
+          </button>
+          <button class="excel-reset-btn" onclick="resetExcelPage()">
+            <i data-lucide="rotate-ccw"></i> 초기화
+          </button>
         </div>
       </div>
       <div id="excelPreviewList" class="excel-preview-list"></div>
@@ -273,10 +358,14 @@
     <div id="excelProgressWrap" style="display:none">
       <div class="excel-progress-header">
         <div class="excel-progress-left">
-          <span class="excel-progress-title">⏳ 최저가 검색 중...</span>
+          <span class="excel-progress-title">
+            <i data-lucide="loader-circle" class="spin-icon" style="width:16px;height:16px;"></i> 최저가 검색 중...
+          </span>
           <span id="excelProgressText" class="excel-progress-count">0 / 0</span>
         </div>
-        <button class="excel-cancel-btn" id="excelCancelBtn" onclick="cancelExcelSearch()">⛔ 검색 취소</button>
+        <button class="excel-cancel-btn" id="excelCancelBtn" onclick="cancelExcelSearch()">
+          <i data-lucide="circle-x"></i> 검색 취소
+        </button>
       </div>
       <div class="excel-progress-bar-bg">
         <div class="excel-progress-bar" id="excelProgressBar" style="width:0%"></div>
@@ -287,10 +376,16 @@
     <!-- 결과 테이블 -->
     <div id="excelResultWrap" style="display:none">
       <div class="excel-result-header">
-        <span class="excel-result-title">✅ 검색 완료</span>
+        <span class="excel-result-title">
+          <i data-lucide="circle-check" style="width:18px;height:18px;stroke:#2e7d32;margin-right:4px;vertical-align:middle;"></i> 검색 완료
+        </span>
         <div class="excel-result-actions">
-          <button class="excel-export-btn" onclick="exportExcelResult()">📥 결과 엑셀 다운로드</button>
-          <button class="excel-reset-btn" onclick="resetExcelPage()">↩ 다시 업로드</button>
+          <button class="excel-export-btn" onclick="exportExcelResult()">
+            <i data-lucide="download"></i> 결과 엑셀 다운로드
+          </button>
+          <button class="excel-reset-btn" onclick="resetExcelPage()">
+            <i data-lucide="rotate-ccw"></i> 다시 업로드
+          </button>
         </div>
       </div>
       <div class="excel-result-table-wrap">
@@ -316,23 +411,23 @@
 <!-- ===== 하단 내비 (모바일) ===== -->
 <nav class="bottom-nav">
   <a href="#" onclick="showPage('home'); return false;" class="bottom-nav-item active" id="nav-home">
-    <span class="nav-icon">🏠</span>
+    <span class="nav-icon"><i data-lucide="home"></i></span>
     <span>홈</span>
   </a>
   <a href="#" onclick="showPage('search'); return false;" class="bottom-nav-item" id="nav-search">
-    <span class="nav-icon">🔍</span>
+    <span class="nav-icon"><i data-lucide="search"></i></span>
     <span>검색</span>
   </a>
   <a href="#" onclick="showPage('excel'); return false;" class="bottom-nav-item" id="nav-excel">
-    <span class="nav-icon">📂</span>
+    <span class="nav-icon"><i data-lucide="file-spreadsheet"></i></span>
     <span>일괄검색</span>
   </a>
   <a href="#" onclick="showPage('compare'); return false;" class="bottom-nav-item" id="nav-compare">
-    <span class="nav-icon">📊</span>
+    <span class="nav-icon"><i data-lucide="bar-chart-2"></i></span>
     <span>비교</span>
   </a>
   <a href="#" onclick="showPage('wishlist'); return false;" class="bottom-nav-item" id="nav-wishlist">
-    <span class="nav-icon">❤️</span>
+    <span class="nav-icon"><i data-lucide="heart"></i></span>
     <span>위시리스트</span>
   </a>
 </nav>
@@ -348,5 +443,11 @@
 <!-- SheetJS: 엑셀 파싱 라이브러리 -->
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="app.js"></script>
+<!-- Lucide 아이콘 렌더링 초기화 -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  });
+</script>
 </body>
 </html>

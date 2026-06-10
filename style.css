@@ -138,6 +138,9 @@ input { outline: none; border: none; }
   white-space: nowrap;
 }
 .header-nav a {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   font-size: 14px;
   font-weight: 500;
   color: var(--gray-600);
@@ -148,9 +151,13 @@ input { outline: none; border: none; }
 .hamburger {
   display: none;
   background: none;
-  font-size: 22px;
+  border: none;
+  padding: 6px;
   color: var(--gray-800);
+  cursor: pointer;
+  line-height: 0;
 }
+.hamburger svg { width: 22px; height: 22px; }
 
 .mobile-menu {
   display: none;
@@ -163,6 +170,9 @@ input { outline: none; border: none; }
 .mobile-menu a {
   padding: 12px 20px;
   font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   color: var(--gray-800);
   font-weight: 500;
   transition: background 0.2s;
@@ -767,7 +777,11 @@ input { outline: none; border: none; }
   cursor: pointer;
   transition: all 0.15s;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
+.nav-link-btn svg { width: 13px; height: 13px; }
 .nav-link-btn:hover {
   background: var(--blue);
   color: #fff;
@@ -910,6 +924,7 @@ input { outline: none; border: none; }
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
 }
 .btn-orange:hover { background: var(--orange-dark); }
 
@@ -919,14 +934,15 @@ input { outline: none; border: none; }
   border-radius: var(--radius-sm);
   border: 1.5px solid var(--gray-200);
   background: white;
-  font-size: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
   cursor: pointer;
+  line-height: 0;
 }
 .btn-wishlist:hover { border-color: var(--red); background: #FFF0F0; }
+.btn-wishlist.wishlisted { border-color: var(--red); background: #FFF0F0; }
 
 /* ===== 쇼핑몰 가격 비교 테이블 ===== */
 .shop-compare-section {
@@ -1174,7 +1190,12 @@ input { outline: none; border: none; }
   transition: all 0.2s;
   white-space: nowrap;
 }
-.cmp-btn-icon { font-size: 15px; }
+.cmp-btn-icon {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+}
+.cmp-btn-icon svg { width: 15px; height: 15px; }
 .cmp-btn-ext {
   font-size: 11px;
   font-weight: 400;
@@ -1603,7 +1624,13 @@ input { outline: none; border: none; }
 .bottom-nav-item.active {
   color: var(--blue);
 }
-.nav-icon { font-size: 22px; }
+.nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+.nav-icon svg { width: 22px; height: 22px; }
 
 /* ===== 반응형 ===== */
 @media (min-width: 768px) {
@@ -1686,7 +1713,11 @@ input { outline: none; border: none; }
   width: 100%;
   flex-wrap: wrap;
 }
-.upload-done-icon { font-size: 20px; }
+.upload-done-icon {
+  display: flex;
+  align-items: center;
+  line-height: 0;
+}
 .upload-done-text {
   flex: 1;
   font-size: 14px;
@@ -1695,6 +1726,18 @@ input { outline: none; border: none; }
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.upload-reselect-btn-base {
+  padding: 6px 14px;
+  background: #fff;
+  border: 1.5px solid #66bb6a;
+  border-radius: 8px;
+  color: #2e7d32;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
 }
 .upload-reselect-btn {
   padding: 6px 14px;
@@ -1709,7 +1752,13 @@ input { outline: none; border: none; }
   font-family: inherit;
 }
 .upload-reselect-btn:hover { background: #f0faf0; }
-.excel-upload-icon { font-size: 48px; line-height: 1; }
+.excel-upload-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+  line-height: 0;
+}
 .excel-upload-text { font-size: 16px; font-weight: 700; color: var(--black); }
 .excel-upload-sub  { font-size: 13px; color: var(--gray-400); }
 .excel-upload-btn {
@@ -1724,25 +1773,58 @@ input { outline: none; border: none; }
   font-family: inherit;
   cursor: pointer;
   transition: background 0.18s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 .excel-upload-btn:hover { background: #1a6fc4; }
+.excel-upload-btn svg { width: 15px; height: 15px; }
+.upload-reselect-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.upload-reselect-btn svg { width: 14px; height: 14px; }
+.upload-reset-btn {
+  background: #fff3f3 !important;
+  border-color: #ef9a9a !important;
+  color: #c62828 !important;
+}
 
 /* 양식 다운로드 힌트 */
 .excel-template-hint {
   background: #fffbeb;
   border: 1px solid #f5d87a;
-  border-radius: 10px;
-  padding: 12px 18px;
+  border-radius: 12px;
+  padding: 14px 18px;
   font-size: 13px;
   color: #7a5c00;
   display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 8px;
   margin-bottom: 24px;
 }
+.template-hint-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  color: #5a4400;
+}
+.template-hint-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  color: #bf360c;
+  background: #fff3e0;
+  border: 1px solid #ffcc80;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+.template-hint-warning strong { color: #e64a19; }
 .excel-template-btn {
-  padding: 6px 14px;
+  padding: 7px 16px;
   background: #f5d87a;
   border: none;
   border-radius: 8px;
@@ -1751,8 +1833,13 @@ input { outline: none; border: none; }
   color: #5a4400;
   font-family: inherit;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
 }
 .excel-template-btn:hover { background: #edc84a; }
+.excel-template-btn svg { width: 14px; height: 14px; }
 
 /* 미리보기 영역 */
 .excel-preview-header {
@@ -1778,6 +1865,9 @@ input { outline: none; border: none; }
   font-family: inherit;
   cursor: pointer;
   transition: background 0.18s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 .excel-search-all-btn:hover { background: #1a6fc4; }
 .excel-search-all-btn:disabled { background: #aac4e8; cursor: not-allowed; }
@@ -2103,3 +2193,68 @@ input { outline: none; border: none; }
   .excel-thumb { width: 32px; height: 32px; }
   .excel-progress-current { font-size: 11px; }
 }
+
+/* ===== Lucide / SVG 아이콘 공통 스타일 ===== */
+
+/* 카드 액션 버튼 (위시/비교) SVG 크기 */
+.card-action-btn svg { width: 16px; height: 16px; pointer-events: none; }
+.card-action-btn { line-height: 0; }
+
+/* 하단 탭바 SVG */
+.bottom-nav-item .nav-icon i,
+.bottom-nav-item .nav-icon svg { width: 22px; height: 22px; }
+
+/* 헤더 검색 버튼 */
+.search-btn-sm svg { width: 16px; height: 16px; }
+.search-btn-sm { line-height: 0; display: inline-flex; align-items: center; justify-content: center; }
+
+/* 히어로 검색 버튼 */
+.hero-search-btn { display: inline-flex; align-items: center; gap: 6px; }
+.hero-search-btn svg { width: 18px; height: 18px; }
+
+/* 탭 버튼 */
+.tab-btn { display: inline-flex; align-items: center; gap: 5px; }
+.tab-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+/* 더보기 버튼 */
+.load-more-btn { display: inline-flex; align-items: center; gap: 5px; }
+.load-more-btn svg { width: 15px; height: 15px; }
+
+/* 페이지 타이틀 SVG */
+.page-title svg, .excel-page-title svg, .cmp-title svg { width: 22px; height: 22px; vertical-align: middle; margin-right: 5px; }
+
+/* 진행상태 타이틀 스핀 아이콘 */
+.spin-icon {
+  animation: lucide-spin 1s linear infinite;
+  vertical-align: middle;
+}
+@keyframes lucide-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.excel-progress-title { display: flex; align-items: center; gap: 6px; }
+
+/* 엑셀 취소/검색 버튼 */
+.excel-cancel-btn { display: inline-flex; align-items: center; gap: 5px; }
+.excel-cancel-btn svg { width: 14px; height: 14px; }
+.excel-export-btn { display: inline-flex; align-items: center; gap: 6px; }
+.excel-export-btn svg { width: 14px; height: 14px; }
+.excel-reset-btn { display: inline-flex; align-items: center; gap: 5px; }
+.excel-reset-btn svg { width: 13px; height: 13px; }
+
+/* 비교 카드 삭제 버튼 X */
+.cmp-card-remove svg { pointer-events: none; }
+
+/* 비교 카드 상세 버튼 */
+.cmp-detail-btn { display: inline-flex; align-items: center; gap: 4px; }
+
+/* 홈 가이드 아이콘 */
+.home-guide-icon { font-size: 0; line-height: 0; margin-bottom: 12px; }
+.home-guide-icon svg { width: 48px; height: 48px; }
+
+/* 결과 타이틀 체크 아이콘 */
+.excel-result-title { display: inline-flex; align-items: center; }
+
+/* 빈 상태 아이콘 */
+.empty-icon { line-height: 0; margin-bottom: 12px; }
+.cmp-empty-icon { line-height: 0; margin-bottom: 16px; }

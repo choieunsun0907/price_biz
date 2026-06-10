@@ -143,7 +143,7 @@ async function triggerSearch(query) {
       document.getElementById('searchLoadMoreWrap').style.display = 'block';
     }
   } catch (e) {
-    document.getElementById('searchGrid').innerHTML = `<div style="padding:32px;color:#999;grid-column:1/-1;text-align:center;">⚠️ 검색 실패: ${e.message}</div>`;
+    document.getElementById('searchGrid').innerHTML = `<div style="padding:32px;color:#999;grid-column:1/-1;text-align:center;">검색 실패: ${e.message}</div>`;
   } finally {
     document.getElementById('searchLoading').style.display = 'none';
   }
@@ -160,11 +160,11 @@ function renderSearchResults(items, append) {
     const tab = state.currentMallType;
     const tabMsgs = {
       'open': `<div style="padding:48px;color:#999;grid-column:1/-1;text-align:center;">
-        🏪 이 검색어는 쇼핑원도(외부몰) 결과가 없어요<br>
+        이 검색어는 쇼핑원도(외부몰) 결과가 없어요<br>
         <small style="font-size:12px;margin-top:8px;display:block">전체 탭에서 검색해보세요</small>
       </div>`,
     };
-    grid.innerHTML = tabMsgs[tab] || `<div style="padding:48px;color:#999;grid-column:1/-1;text-align:center;">🔍 검색 결과가 없어요</div>`;
+    grid.innerHTML = tabMsgs[tab] || `<div style="padding:48px;color:#999;grid-column:1/-1;text-align:center;"> 검색 결과가 없어요</div>`;
   }
 }
 
@@ -227,7 +227,7 @@ async function _reloadSearchResults() {
       document.getElementById('searchLoadMoreWrap').style.display = 'block';
     }
   } catch (e) {
-    document.getElementById('searchGrid').innerHTML = '<div style="padding:32px;color:#999;grid-column:1/-1;text-align:center;">⚠️ 검색 실패: ' + e.message + '</div>';
+    document.getElementById('searchGrid').innerHTML = '<div style="padding:32px;color:#999;grid-column:1/-1;text-align:center;">검색 실패: ' + e.message + '</div>';
   } finally {
     document.getElementById('searchLoading').style.display = 'none';
   }
@@ -311,7 +311,7 @@ function _showHomeGuide() {
   if (!grid) return;
   grid.innerHTML = `
     <div class="home-guide-wrap">
-      <div class="home-guide-icon">🛒</div>
+      <div class="home-guide-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></div>
       <div class="home-guide-title">위 카테고리 탭을 눌러보세요!</div>
       <div class="home-guide-desc">싸카닷컴, 축구화, 유니폼 등 카테고리별 최저가 상품을 확인하세요</div>
     </div>
@@ -338,7 +338,7 @@ async function selectCategory(category, btn) {
       document.getElementById('loadMoreWrap').style.display = 'block';
     }
   } catch (e) {
-    document.getElementById('homeGrid').innerHTML = `<div style="padding:32px;color:#999;grid-column:1/-1;text-align:center;">⚠️ 불러오기 실패</div>`;
+    document.getElementById('homeGrid').innerHTML = `<div style="padding:32px;color:#999;grid-column:1/-1;text-align:center;">불러오기 실패</div>`;
   } finally {
     document.getElementById('homeLoading').style.display = 'none';
   }
@@ -386,12 +386,12 @@ function createProductCard(item) {
         <button class="card-action-btn ${isWished ? 'wishlisted' : ''}" 
                 onclick="toggleWishlist(event, '${escAttr(item.id)}')" 
                 title="위시리스트">
-          ${isWished ? '❤️' : '🤍'}
+          ${isWished ? '<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"#e53935\" stroke=\"#e53935\" stroke-width=\"2\"><path d=\"M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z\"/></svg>' : '<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z\"/></svg>'}
         </button>
         <button class="card-action-btn ${isCompared ? 'wishlisted' : ''}" 
                 onclick="toggleCompare(event, '${escAttr(item.id)}')" 
                 title="비교에 추가">
-          📊
+          
         </button>
       </div>
     </div>
@@ -426,7 +426,7 @@ function _renderDetailContent(item) {
   const isWished = state.wishlist.some(w => w.id === item.id);
   const safeId = String(item.id || '').replace(/'/g, "\\'");
 
-  /* ✅ URL을 HTML 속성 안에 안전하게 넣기 위해 & → &amp; 변환 */
+  /*  URL을 HTML 속성 안에 안전하게 넣기 위해 & → &amp; 변환 */
   function safeHref(url) {
     if (!url || url === '#') return '#';
     return url.replace(/&/g, '&amp;');
@@ -448,22 +448,22 @@ function _renderDetailContent(item) {
           <div class="detail-title">${escHtml(item.title)}</div>
           <div class="detail-best-price-wrap">
             <div>
-              <div class="detail-best-price-label">🏆 최저가</div>
+              <div class="detail-best-price-label">최저가</div>
               <div class="detail-best-price"><span>₩</span>${(item.lprice || 0).toLocaleString()}</div>
             </div>
             ${bestShop ? `<div style="font-size:12px;color:#E8950E;font-weight:600;">${escHtml(bestShop.name)}</div>` : ''}
           </div>
           <div class="detail-btn-row">
             <a href="${safeHref(item.link)}" target="_blank" rel="noopener" class="btn-orange">
-              🛍️ 네이버 최저가 보기
+              네이버 최저가 보기
             </a>
             <button class="btn-wishlist" onclick="toggleWishlistDetail('${safeId}')" id="wishBtn">
-              ${isWished ? '❤️' : '🤍'}
+              ${isWished ? '<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"#e53935\" stroke=\"#e53935\" stroke-width=\"2\"><path d=\"M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z\"/></svg>' : '<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z\"/></svg>'}
             </button>
           </div>
           <div class="detail-btn-row" style="margin-top:0">
             <button class="btn-primary" onclick="toggleCompareFromDetail('${safeId}')">
-              📊 비교에 추가
+               비교에 추가
             </button>
           </div>
         </div>
@@ -471,9 +471,9 @@ function _renderDetailContent(item) {
     </div>
 
     <div class="shop-compare-section">
-      <div class="shop-compare-title">🏪 쇼핑몰별 가격 비교</div>
+      <div class="shop-compare-title">쇼핑몰별 가격 비교</div>
       ${shops.length === 0
-        ? `<div style="padding:24px;color:#999;text-align:center;">⏳ 쇼핑몰 정보를 불러오는 중...</div>`
+        ? `<div style="padding:24px;color:#999;text-align:center;">쇼핑몰 정보를 불러오는 중...</div>`
         : shops.map((shop, idx) => `
               <a href="${safeHref(shop.url)}" target="_blank" rel="noopener" class="shop-row">
                 <div class="shop-logo-wrap">
@@ -539,7 +539,7 @@ function toggleWishlist(event, itemId) {
     showToast('위시리스트에서 제거됐어요');
   } else {
     state.wishlist.push(item);
-    showToast('❤️ 위시리스트에 추가됐어요!');
+    showToast('위시리스트에 추가됐어요!');
   }
   localStorage.setItem('wishlist', JSON.stringify(state.wishlist));
   refreshCards();
@@ -551,12 +551,12 @@ function toggleWishlistDetail(itemId) {
   const idx = state.wishlist.findIndex(w => w.id === itemId);
   if (idx >= 0) {
     state.wishlist.splice(idx, 1);
-    document.getElementById('wishBtn').textContent = '🤍';
+    document.getElementById('wishBtn').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
     showToast('위시리스트에서 제거됐어요');
   } else {
     state.wishlist.push(item);
-    document.getElementById('wishBtn').textContent = '❤️';
-    showToast('❤️ 위시리스트에 추가됐어요!');
+    document.getElementById('wishBtn').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="#e53935" stroke="#e53935" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
+    showToast('위시리스트에 추가됐어요!');
   }
   localStorage.setItem('wishlist', JSON.stringify(state.wishlist));
 }
@@ -588,7 +588,7 @@ async function _ensureShops(item) {
     _registerItem(item);
     return item;
   }
-  // ✅ shops가 없으면 /api/detail 엔드포인트로 빠르게 가져오기
+  //  shops가 없으면 /api/detail 엔드포인트로 빠르게 가져오기
   try {
     const q   = encodeURIComponent(item.title || '');
     const lnk = encodeURIComponent(item.link  || '');
@@ -630,11 +630,11 @@ function toggleCompare(event, itemId) {
     updateCompareBadge();
   } else {
     if (state.compareList.length >= MAX_COMPARE) {
-      // ✅ 확인 팝업: 제거할 상품 선택
+      //  확인 팝업: 제거할 상품 선택
       showCompareFullModal(item);
     } else {
       state.compareList.push(item);
-      showToast(`📊 비교 목록에 추가됐어요! (${state.compareList.length}/${MAX_COMPARE})`);
+      showToast(`비교 목록에 추가됐어요! (${state.compareList.length}/${MAX_COMPARE})`);
       localStorage.setItem('compareList', JSON.stringify(state.compareList));
       refreshCards();
       updateCompareBadge();
@@ -657,7 +657,7 @@ function toggleCompareFromDetail(itemId) {
       showCompareFullModal(item);
     } else {
       state.compareList.push(item);
-      showToast(`📊 비교 목록에 추가됐어요! (${state.compareList.length}/${MAX_COMPARE})`);
+      showToast(`비교 목록에 추가됐어요! (${state.compareList.length}/${MAX_COMPARE})`);
       localStorage.setItem('compareList', JSON.stringify(state.compareList));
       refreshCards();
       updateCompareBadge();
@@ -700,13 +700,13 @@ function showCompareFullModal(newItem) {
     <div style="background:#fff;border-radius:16px;width:100%;max-width:420px;
                 box-shadow:0 8px 40px rgba(0,0,0,0.18);overflow:hidden;">
       <div style="background:linear-gradient(135deg,#1976D2,#42A5F5);padding:18px 20px;">
-        <div style="font-size:16px;font-weight:700;color:#fff;">📊 비교 목록이 가득 찼어요</div>
+        <div style="font-size:16px;font-weight:700;color:#fff;">비교 목록이 가득 찼어요</div>
         <div style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:4px;">
           <strong style="color:#FFD54F;">"${newTitle}..."</strong> 추가를 위해<br>교체할 상품을 선택해주세요
         </div>
       </div>
       <div style="padding:12px 16px;max-height:340px;overflow-y:auto;">
-        <div style="font-size:12px;color:#888;margin-bottom:8px;">👇 아래 상품 중 하나를 선택하면 교체됩니다</div>
+        <div style="font-size:12px;color:#888;margin-bottom:8px;">아래 상품 중 하나를 선택하면 교체됩니다</div>
         <div id="cmpModalList" style="display:flex;flex-direction:column;gap:8px;">
           ${listHTML}
         </div>
@@ -761,7 +761,7 @@ function replaceCompareItem(removeIdx, newItemId) {
   document.getElementById('compareFullModal')?.remove();
   window._pendingCompareItem = null;
 
-  showToast(`🔄 "${removedTitle}.." 제거 → 새 상품 추가됐어요!`);
+  showToast(`"${removedTitle}.." 제거 → 새 상품 추가됐어요!`);
   if (state.currentPage === 'compare') renderCompare();
 }
 
@@ -820,7 +820,7 @@ function renderCompare() {
           <span class="cmp-card-chk-box"></span>
           <span class="cmp-card-chk-text">선택</span>
         </label>
-        <button class="cmp-card-remove" type="button" title="이 상품 제거">✕</button>
+        <button class="cmp-card-remove" type="button" title="이 상품 제거"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
       <div class="cmp-card-overlay"></div>
 
@@ -862,7 +862,7 @@ function renderCompare() {
           </div>
         </div>
 
-        <button class="cmp-detail-btn" type="button">🔍 쇼핑몰별 가격 비교 →</button>
+        <button class="cmp-detail-btn" type="button"> 쇼핑몰별 가격 비교 →</button>
       </div>
     `;
 
@@ -979,7 +979,7 @@ function toggleCheckAll(el) {
 ───────────────────────────────────────── */
 function deleteSelected() {
   if (checkedIndexes.size === 0) {
-    showToast('⚠️ 삭제할 상품을 먼저 체크해주세요');
+    showToast('삭제할 상품을 먼저 체크해주세요');
     return;
   }
   const sortedIdxs = Array.from(checkedIndexes).sort((a, b) => b - a);
@@ -988,7 +988,7 @@ function deleteSelected() {
   localStorage.setItem('compareList', JSON.stringify(state.compareList));
   refreshCards();
   renderCompare();
-  showToast(`🗑️ ${cnt}개 상품이 삭제됐어요`);
+  showToast(`${cnt}개 상품이 삭제됐어요`);
 }
 
 /* ─────────────────────────────────────────
@@ -998,7 +998,7 @@ function deleteSelected() {
 function exportSelectedText() {
   const targets = _getTargets();
   if (targets.length === 0) {
-    showToast('⚠️ 비교 목록이 비어있어요');
+    showToast('비교 목록이 비어있어요');
     return;
   }
 
@@ -1044,17 +1044,17 @@ function exportSelectedText() {
   txt += `※ 싸카스포츠 가격비교 사이트 (네이버 쇼핑 API 연동)\n`;
 
   _downloadFile(txt, `싸카스포츠_가격비교_${_nowStr()}.txt`, 'text/plain;charset=utf-8');
-  showToast(`📄 텍스트 저장 완료! (${targets.length}개 상품)`);
+  showToast(`텍스트 저장 완료! (${targets.length}개 상품)`);
 }
 
 /* ─────────────────────────────────────────
-   📊 엑셀(.csv) 저장
+    엑셀(.csv) 저장
    저장 내용: 상품코드 · 최저가 · 링크 + 전체 필드
 ───────────────────────────────────────── */
 function exportSelectedCSV() {
   const targets = _getTargets();
   if (targets.length === 0) {
-    showToast('⚠️ 비교 목록이 비어있어요');
+    showToast('비교 목록이 비어있어요');
     return;
   }
 
@@ -1082,7 +1082,7 @@ function exportSelectedCSV() {
 
   const csv = BOM + [headers.join(','), ...rows].join('\n');
   _downloadFile(csv, `싸카스포츠_가격비교_${_nowStr()}.csv`, 'text/csv;charset=utf-8');
-  showToast(`📊 엑셀(CSV) 저장 완료! (${targets.length}개 상품)`);
+  showToast(`엑셀(CSV) 저장 완료! (${targets.length}개 상품)`);
 }
 
 /* ─────────────────────────────────────────
@@ -1158,7 +1158,7 @@ function refreshCards() {
     const compareFooterBtn = card.querySelector('.card-compare-btn');
 
     if (wishBtn) {
-      wishBtn.textContent = isWished ? '❤️' : '🤍';
+      wishBtn.innerHTML = isWished ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#e53935" stroke="#e53935" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
       wishBtn.classList.toggle('wishlisted', isWished);
     }
     if (compareBtn) {
@@ -1263,13 +1263,13 @@ function handleExcelFile(file) {
 
   // XLSX 라이브러리 로드 확인
   if (typeof XLSX === 'undefined') {
-    showToast('⚠️ 엑셀 라이브러리 로딩 중입니다. 잠시 후 다시 시도해주세요.');
+    showToast('엑셀 라이브러리 로딩 중입니다. 잠시 후 다시 시도해주세요.');
     return;
   }
 
   var ext = file.name.split('.').pop().toLowerCase();
   if (!['xlsx','xls','csv'].includes(ext)) {
-    showToast('⚠️ .xlsx, .xls, .csv 파일만 지원합니다');
+    showToast('.xlsx, .xls, .csv 파일만 지원합니다');
     return;
   }
 
@@ -1294,7 +1294,7 @@ function handleExcelFile(file) {
       names = names.slice(0, 200);
 
       if (names.length === 0) {
-        showToast('⚠️ A열에 상품명이 없습니다. 파일을 확인해주세요.');
+        showToast('A열에 상품명이 없습니다. 파일을 확인해주세요.');
         return;  // finally에서 zone 복원됨
       }
       excelState.items   = names;
@@ -1303,14 +1303,14 @@ function handleExcelFile(file) {
       // 업로드 완료 → 업로드존 축소 + 스크롤
       _collapseUploadZone(file.name);
     } catch(err) {
-      showToast('⚠️ 파일 읽기 실패: ' + err.message);
+      showToast('파일 읽기 실패: ' + err.message);
     } finally {
       // 업로드존 포인터 이벤트 반드시 복원 (성공·실패·빈파일 모두)
       if (zone) zone.style.pointerEvents = '';
     }
   };
   reader.onerror = function() {
-    showToast('⚠️ 파일을 읽을 수 없습니다.');
+    showToast('파일을 읽을 수 없습니다.');
     if (zone) zone.style.pointerEvents = '';
   };
   reader.readAsArrayBuffer(file);
@@ -1327,7 +1327,7 @@ function _collapseUploadZone(fileName) {
   // 완료 상태로 전환
   if (defaultView) defaultView.style.display = 'none';
   if (doneView)    doneView.style.display     = 'flex';
-  if (doneText)    doneText.textContent       = '✅ ' + fileName + ' 업로드 완료';
+  if (doneText)    doneText.textContent       = ' ' + fileName + ' 업로드 완료';
 
   zone.style.padding     = '14px 20px';
   zone.style.cursor      = 'default';
@@ -1349,7 +1349,7 @@ function _renderExcelPreview(names, fileName) {
 
   var validCount = names.filter(function(n) { return n.length >= 2; }).length;
   document.getElementById('excelPreviewCount').innerHTML =
-    '📋 <strong>' + names.length + '개</strong> 상품 인식' +
+    ' <strong>' + names.length + '개</strong> 상품 인식' +
     (fileName ? ' <span class="file-name-badge">' + escHtml(fileName) + '</span>' : '') +
     (validCount < names.length ? ' <span style="color:#e53935;font-size:12px;">(너무 짧은 이름 ' + (names.length - validCount) + '개 제외)</span>' : '');
 
@@ -1365,14 +1365,14 @@ function _renderExcelPreview(names, fileName) {
   });
 
   var btn = document.getElementById('excelSearchAllBtn');
-  if (btn) { btn.disabled = false; btn.textContent = '🔍 전체 최저가 검색 시작 (' + validCount + '개)'; }
+  if (btn) { btn.disabled = false; btn.textContent = '전체 최저가 검색 시작 (' + validCount + '개)'; }
 }
 
 /* 전체 일괄 검색 시작 */
 async function startExcelBulkSearch() {
   if (excelState.isSearching) return;
   var names = excelState.items.filter(function(n) { return n.length >= 2; });
-  if (names.length === 0) { showToast('⚠️ 유효한 상품명이 없습니다'); return; }
+  if (names.length === 0) { showToast('유효한 상품명이 없습니다'); return; }
 
   excelState.isSearching     = true;
   excelState.cancelRequested = false;
@@ -1382,7 +1382,7 @@ async function startExcelBulkSearch() {
   var startBtn  = document.getElementById('excelSearchAllBtn');
   var cancelBtn = document.getElementById('excelCancelBtn');
   if (startBtn)  startBtn.style.display  = 'none';
-  if (cancelBtn) { cancelBtn.style.display = 'inline-flex'; cancelBtn.disabled = false; cancelBtn.textContent = '⛔ 검색 취소'; }
+  if (cancelBtn) { cancelBtn.style.display = 'inline-flex'; cancelBtn.disabled = false; cancelBtn.textContent = '검색 취소'; }
 
   // 진행바 표시, 미리보기/결과는 숨김
   document.getElementById('excelProgressWrap').style.display = 'block';
@@ -1393,7 +1393,7 @@ async function startExcelBulkSearch() {
     for (var i = 0; i < names.length; i++) {
       // 취소 체크
       if (excelState.cancelRequested) {
-        showToast('⛔ 검색이 취소됐습니다 (' + i + '/' + names.length + '개 완료)');
+        showToast(' 검색이 취소됐습니다 (' + i + '/' + names.length + '개 완료)');
         break;
       }
 
@@ -1446,7 +1446,7 @@ function cancelExcelSearch() {
   if (!excelState.isSearching) return;
   excelState.cancelRequested = true;
   var cancelBtn = document.getElementById('excelCancelBtn');
-  if (cancelBtn) { cancelBtn.disabled = true; cancelBtn.textContent = '⏳ 취소 중...'; }
+  if (cancelBtn) { cancelBtn.disabled = true; cancelBtn.textContent = '취소 중...'; }
 }
 
 /* 진행 상태 업데이트 */
@@ -1457,7 +1457,7 @@ function _updateExcelProgress(done, total, currentName) {
   var cur = document.getElementById('excelProgressCurrent');
   if (bar) bar.style.width = pct + '%';
   if (txt) txt.textContent = done + ' / ' + total + ' (' + pct + '%)';
-  if (cur && currentName) cur.textContent = '🔍 검색 중: ' + currentName;
+  if (cur && currentName) cur.textContent = '검색 중: ' + currentName;
 }
 
 /* 결과 테이블 렌더링 */
@@ -1471,7 +1471,7 @@ function _renderExcelResults(results) {
     var noResultCount = results.filter(function(r) {
       return r.top3[0] && (r.top3[0].title === '검색결과 없음' || r.top3[0].title === 'API 오류');
     }).length;
-    titleEl.innerHTML = '✅ 검색 완료 <span class="result-stat">' + results.length + '개 상품</span>' +
+    titleEl.innerHTML = '검색 완료 <span class="result-stat">' + results.length + '개 상품</span>' +
       (noResultCount > 0 ? ' <span class="result-stat-warn">결과없음 ' + noResultCount + '개</span>' : '');
   }
 
@@ -1562,7 +1562,7 @@ function _renderExcelResults(results) {
 
 /* 결과 엑셀 다운로드 (개선: 썸네일URL 포함) */
 function exportExcelResult() {
-  if (!excelState.results.length) { showToast('⚠️ 검색 결과가 없습니다'); return; }
+  if (!excelState.results.length) { showToast('검색 결과가 없습니다'); return; }
 
   var rows = [['No', '검색 상품명', '순위', '실제 상품명', '최저가(원)', '쇼핑몰', '상품 링크', '이미지 URL']];
   excelState.results.forEach(function(item, idx) {
@@ -1590,27 +1590,38 @@ function exportExcelResult() {
   var wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, '최저가검색결과');
   XLSX.writeFile(wb, '싸카_최저가검색_' + new Date().toISOString().slice(0,10) + '.xlsx');
-  showToast('📥 결과 엑셀 다운로드 완료! (' + excelState.results.length + '개 상품)');
+  showToast('결과 엑셀 다운로드 완료! (' + excelState.results.length + '개 상품)');
 }
 
-/* 예시 양식 다운로드 */
+/* 샘플 양식 다운로드
+   ※ 1행은 "상품명" 헤더 → 업로드 시 반드시 삭제 안내 포함 */
 function downloadExcelTemplate() {
   var rows = [
-    ['상품명'],
+    ['상품명'],                              // ← 1행: 헤더 (업로드 전 이 행 삭제)
+    ['IQ3579400'],
+    ['IO8226900'],
     ['아디다스 레알마드리드 유니폼'],
     ['나이키 메르쿠리알 축구화'],
     ['오클리 선글라스'],
     ['대한민국 국가대표 유니폼'],
     ['푸마 트레이닝복'],
-    ['살로몬 트레일화'],
-    ['언더아머 압박 레깅스'],
   ];
   var ws = XLSX.utils.aoa_to_sheet(rows);
+
+  // 1행(헤더) 강조: 배경색 + 굵게 + 안내 코멘트
+  if (!ws['A1']) ws['A1'] = {};
+  ws['A1'].s = {
+    fill: { fgColor: { rgb: 'FFD700' } },
+    font: { bold: true },
+    alignment: { horizontal: 'center' }
+  };
+
   ws['!cols'] = [{wch: 35}];
+
   var wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, '상품목록');
-  XLSX.writeFile(wb, '싸카_검색양식_예시.xlsx');
-  showToast('📥 예시 양식 다운로드 완료');
+  XLSX.writeFile(wb, '싸카_검색양식샘플.xlsx');
+  showToast('샘플 양식 다운로드 완료 — 1행(상품명 헤더)을 삭제 후 업로드하세요');
 }
 
 /* 초기화 */
@@ -1625,8 +1636,8 @@ function resetExcelPage() {
   // 버튼 복구
   var startBtn = document.getElementById('excelSearchAllBtn');
   var cancelBtn = document.getElementById('excelCancelBtn');
-  if (startBtn)  { startBtn.style.display = 'inline-flex'; startBtn.disabled = false; startBtn.textContent = '🔍 전체 최저가 검색 시작'; }
-  if (cancelBtn) { cancelBtn.style.display = 'none'; cancelBtn.disabled = false; cancelBtn.textContent = '⛔ 검색 취소'; }
+  if (startBtn)  { startBtn.style.display = 'inline-flex'; startBtn.disabled = false; startBtn.textContent = '전체 최저가 검색 시작'; }
+  if (cancelBtn) { cancelBtn.style.display = 'none'; cancelBtn.disabled = false; cancelBtn.textContent = '검색 취소'; }
   // 업로드존 원래대로 복원
   _restoreUploadZone();
 }
