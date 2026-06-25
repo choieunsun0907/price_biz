@@ -1752,6 +1752,12 @@ input { outline: none; border: none; }
   font-family: inherit;
 }
 .upload-reselect-btn:hover { background: #f0faf0; }
+#uploadDefaultView {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
 .excel-upload-icon {
   display: flex;
   align-items: center;
