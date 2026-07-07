@@ -1615,6 +1615,9 @@ function downloadExcelTemplate() {
     font: { bold: true },
     alignment: { horizontal: 'center' }
   };
+  // A1 셀에 노트(코멘트) 추가 — 업로드 전 1행 삭제 안내
+  ws['A1'].c = [{ a: 'Note', t: '파일 업로드시 1행을 삭제후 업로드 해주세요' }];
+  ws['A1'].c.hidden = false;
 
   ws['!cols'] = [{wch: 35}];
 
