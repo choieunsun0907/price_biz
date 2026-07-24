@@ -363,6 +363,11 @@ input { outline: none; border: none; }
 }
 .tab-row::-webkit-scrollbar { display: none; }
 
+/* 넓은 화면에서는 탭이 왼쪽에 몰리지 않도록 가운데 정렬 (좁은 화면은 기존처럼 좌측정렬+스크롤 유지) */
+@media (min-width: 1024px) {
+  .tab-row { justify-content: center; }
+}
+
 .tab-btn {
   white-space: nowrap;
   background: var(--white);
