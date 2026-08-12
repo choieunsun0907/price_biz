@@ -12,15 +12,30 @@
 </head>
 <body>
 
+<!-- ===== 서비스 점검 공지 배너 ===== -->
+<div class="maintenance-banner" id="maintenanceBanner">
+  <div class="maintenance-banner-inner">
+    <i data-lucide="triangle-alert"></i>
+    <span>
+      <strong>서비스 점검 안내</strong> —
+      네이버 쇼핑 검색 API가 2026년 7월 31일부로 공식 종료되어 현재 검색 서비스를 점검 중입니다.
+      빠른 시일 내 새로운 검색 서비스로 복구하겠습니다. 불편을 드려 죄송합니다.
+    </span>
+    <button class="maintenance-banner-close" onclick="document.getElementById('maintenanceBanner').style.display='none'">
+      <i data-lucide="x"></i>
+    </button>
+  </div>
+</div>
+
 <!-- ===== 헤더 ===== -->
 <header class="header" id="header">
   <div class="header-inner">
     <a href="#" class="logo" onclick="showPage('home'); return false;">
       <span class="logo-brand">싸카스포츠</span> <span class="logo-desc">가격비교 사이트<span class="logo-api">(네이버API연동)</span></span>
     </a>
-    <div class="search-bar-header" id="headerSearch">
-      <input type="text" id="headerSearchInput" placeholder="상품명을 검색하세요..." autocomplete="off">
-      <button onclick="doSearch()" class="search-btn-sm">
+    <div class="search-bar-header search-bar-header-disabled" id="headerSearch">
+      <input type="text" id="headerSearchInput" placeholder="검색 점검 중..." autocomplete="off" disabled>
+      <button onclick="doSearch()" class="search-btn-sm" disabled>
         <i data-lucide="search"></i>
       </button>
     </div>
@@ -62,14 +77,25 @@
   <section class="hero">
     <div class="hero-content">
       <h1 class="hero-title">
-        싸카 네이버 <span class="hero-blue">최저가 비교 검색</span>
+        싸카 <span class="hero-blue">가격비교 서비스</span>
       </h1>
-      <p class="hero-sub">네이버 쇼핑 실시간 데이터로 여러 쇼핑몰 가격을 한눈에</p>
-      <div class="hero-search">
-        <input type="text" id="heroSearchInput" placeholder="어떤 상품을 찾으세요? (예: 축구화, 오클리 선글라스...)" autocomplete="off"
-               onkeypress="if(event.key==='Enter') doHeroSearch()">
-        <button onclick="doHeroSearch()" class="hero-search-btn">
-          <i data-lucide="search"></i> 검색
+      <p class="hero-sub">더 나은 서비스로 곧 돌아오겠습니다</p>
+
+      <!-- 점검 안내 박스 -->
+      <div class="hero-maintenance-box">
+        <div class="hero-maintenance-icon"><i data-lucide="wrench"></i></div>
+        <div class="hero-maintenance-text">
+          <strong>🔧 서비스 점검 중</strong>
+          <p>네이버 쇼핑 검색 API 서비스가 <strong>2026년 7월 31일</strong>부로 공식 종료됨에 따라<br>
+          현재 새로운 검색 엔진으로 교체 작업을 진행하고 있습니다.</p>
+          <p class="hero-maintenance-eta">✅ 엑셀 일괄검색 · 위시리스트 · 비교 기능은 정상 이용 가능합니다</p>
+        </div>
+      </div>
+
+      <div class="hero-search hero-search-disabled">
+        <input type="text" id="heroSearchInput" placeholder="검색 서비스 점검 중입니다..." autocomplete="off" disabled>
+        <button class="hero-search-btn" disabled>
+          <i data-lucide="search"></i> 점검중
         </button>
       </div>
 

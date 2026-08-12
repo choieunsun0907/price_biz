@@ -112,6 +112,11 @@ function doHeroSearch() {
 function searchChip(q) { triggerSearch(q); }
 
 async function triggerSearch(query) {
+  // ===== 서비스 점검 중 — 검색 차단 =====
+  showToast('⚠️ 검색 서비스 점검 중입니다. 빠른 시일 내 복구하겠습니다.', 'warning');
+  return;
+  // ===== 점검 차단 끝 =====
+
   state.currentQuery = query;
   state.searchStart = 1;
   document.getElementById('headerSearchInput').value = query;
@@ -320,6 +325,11 @@ function _showHomeGuide() {
 }
 
 async function selectCategory(category, btn) {
+  // ===== 서비스 점검 중 — 카테고리 탭 차단 =====
+  showToast('⚠️ 검색 서비스 점검 중입니다. 빠른 시일 내 복구하겠습니다.', 'warning');
+  return;
+  // ===== 점검 차단 끝 =====
+
   state.homeCategory = category;
   state.homeStart = 1;
 
@@ -1176,12 +1186,19 @@ function toggleMenu() {
 }
 
 let toastTimer = null;
-function showToast(msg) {
+function showToast(msg, type) {
   const toast = document.getElementById('toast');
   toast.textContent = msg;
+  // type: 'warning' | 'error' | undefined(기본)
+  toast.classList.remove('toast-warning', 'toast-error');
+  if (type === 'warning') toast.classList.add('toast-warning');
+  else if (type === 'error') toast.classList.add('toast-error');
   toast.classList.add('show');
   if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
+  const duration = (type === 'warning' || type === 'error') ? 4000 : 2500;
+  toastTimer = setTimeout(() => {
+    toast.classList.remove('show', 'toast-warning', 'toast-error');
+  }, duration);
 }
 
 function escHtml(str) {
